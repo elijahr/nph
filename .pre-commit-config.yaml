@@ -1,24 +1,14 @@
-repos:
-  # Use nph's own hook for formatting Nim files
-- repo: local
-  hooks:
-  - id: nph
-    name: nph
-    description: nph - opinionated Nim code formatter
-    entry: nph
-    language: system
-    files: \.nim(s|ble)?$
 
+exclude: ^(tests/(before|after)/.*|.*\.dSYM/.*)$
+
+repos:
   # General file cleanups
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v5.0.0
   hooks:
   - id: trailing-whitespace
-    exclude: ^tests/(before|after)/.*\.nph\.yaml$
   - id: end-of-file-fixer
-    exclude: ^tests/(before|after)/(.*\.nph\.yaml|a00empty\.nim)$
   - id: check-yaml
-    exclude: ^(tests/(before|after)/.*\.nph\.yaml|.*\.dSYM/.*)$
   - id: check-toml
   - id: check-added-large-files
   - id: check-merge-conflict
@@ -27,7 +17,6 @@ repos:
   - id: check-case-conflict
   - id: check-executables-have-shebangs
   - id: check-shebang-scripts-are-executable
-    exclude: ^tests/(before|after)/.*\.nim$
 
   # Shell script formatting and linting
 - repo: https://github.com/scop/pre-commit-shfmt
@@ -57,4 +46,14 @@ repos:
   hooks:
   - id: pretty-format-yaml
     args: [--autofix, --indent, '2']
-    exclude: ^(tests/(before|after)/.*\.nph\.yaml|.*\.dSYM/.*)$
+
+  # Use nph's own hook for formatting Nim files
+- repo: local
+  hooks:
+  - id: nph
+    name: ./nph
+    description: nph - opinionated Nim code formatter
+    entry: ./nph
+    language: system
+    files: \.nim(s|ble)?$
+    args: [--debug]

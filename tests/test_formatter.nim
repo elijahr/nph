@@ -1,52 +1,87 @@
-import std/[unittest, os, osproc, strutils, algorithm, times]
+## nph test suite with compile-time test generation
+##
+## The "formatter tests" suite is generated at compile time based on files
+## in tests/before/*.nim. When you add/remove test files, the const changes
+## and Nim automatically recompiles.
+##
+## All other test suites are defined normally below.
+
+import std/[unittest, os, osproc, strutils, sequtils, macros, times]
 
 const
   nphBin = "./nph"
   testsDir = "tests"
 
-proc getTestFiles(): seq[string] =
-  let beforeDir = testsDir / "before"
-  for file in walkDir(beforeDir):
-    if file.kind == pcFile and file.path.endsWith(".nim"):
-      result.add(file.path.extractFilename())
-  result.sort()
+  # Discover test files at compile time - cache busts when files change!
+  testFileList = staticExec(
+    "find " & currentSourcePath.parentDir() & "/before " &
+    "-name '*.nim' -type f -exec basename {} \\; | sort"
+  )
 
-suite "formatter tests":
-  let testFiles = getTestFiles()
+  testFiles = block:
+    let files = testFileList.strip().splitLines()
+    files.filterIt(it.len > 0)
+
+# Show discovered tests at compile time
+static:
+  echo "\n=== Compile-time test discovery ==="
+  echo "Found ", testFiles.len, " formatter test files:"
+  for f in testFiles:
+    echo "  ✓ ", f
+  echo "===================================\n"
+
+macro generateFormatterTests(): untyped =
+  ## Generate a test case for each file in tests/before/*.nim
+  result = newStmtList()
+
+  var testCases = newStmtList()
 
   for testFile in testFiles:
-    test testFile:
-      let
-        beforeFile = testsDir / "before" / testFile
-        afterFile = testsDir / "after" / testFile
-        tmpFile = "/tmp/nph_test_" & testFile
+    let
+      testName = newLit(testFile)
+      beforePath = newLit(testsDir / "before" / testFile)
+      afterPath = newLit(testsDir / "after" / testFile)
+      tmpPath = newLit("/tmp/nph_test_" & testFile)
 
-      check fileExists(afterFile)
-      if not fileExists(afterFile):
-        echo "Missing expected output file: " & afterFile
-        skip()
+    testCases.add(quote do:
+      test `testName`:
+        let
+          beforeFile = `beforePath`
+          afterFile = `afterPath`
+          tmpFile = `tmpPath`
 
-      # Format the before file
-      let (output, exitCode) =
-        execCmdEx(nphBin & " " & beforeFile & " --out:" & tmpFile)
+        check fileExists(afterFile)
+        if not fileExists(afterFile):
+          echo "Missing expected output file: " & afterFile
+          skip()
 
-      check exitCode == 0
-      if exitCode != 0:
-        echo output
-        skip()
+        let (output, exitCode) =
+          execCmdEx(nphBin & " " & beforeFile & " --out:" & tmpFile)
 
-      let
-        formatted = readFile(tmpFile)
-        expected = readFile(afterFile)
+        check exitCode == 0
+        if exitCode != 0:
+          echo output
+          skip()
 
-      if formatted != expected:
-        # Show diff for nice output
-        let (diffOutput, _) =
-          execCmdEx("diff -u " & afterFile & " " & tmpFile & " || true")
-        echo "\n" & diffOutput
+        let
+          formatted = readFile(tmpFile)
+          expected = readFile(afterFile)
 
-      check formatted == expected
-      removeFile(tmpFile)
+        if formatted != expected:
+          let (diffOutput, _) =
+            execCmdEx("diff -u " & afterFile & " " & tmpFile & " || true")
+          echo "\n" & diffOutput
+
+        check formatted == expected
+        removeFile(tmpFile)
+    )
+
+  result = quote do:
+    suite "formatter tests":
+      `testCases`
+
+# Generate formatter tests at compile time
+generateFormatterTests()
 
 suite "--diff mode":
   test "--diff shows diff and exits 0 when formatting needed":
@@ -57,7 +92,7 @@ suite "--diff mode":
     check exitCode == 0
     check "--- tests/before/fmton.nim" in output
     check "+++ tests/before/fmton.nim (formatted)" in output
-    check "proc getsFormatted" in output
+    check "proc hanging" in output
     check "All done! ✨ 👑 ✨" in output
     check "1 file would be reformatted" in output
 
@@ -230,11 +265,6 @@ suite "error handling":
     check exitCode == 3
     check "cannot be parsed" in output
     removeFile(tmpFile)
-
-  test "invalid output exits with error code":
-    # This test would require a file that parses but produces invalid output
-    # which is a bug in nph itself - hard to test without triggering actual bugs
-    skip()
 
   test "error recovery with multiple files":
     let

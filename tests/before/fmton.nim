@@ -10,8 +10,8 @@ let
     [1, 2, 3]
 
 #!fmt: on
-proc hanging(indent: int, isUgly = true) =
-  discard
+proc hanging(indent: int,
+             isUgly = true) = discard
 
 block:
   #!fmt: off
@@ -19,17 +19,13 @@ block:
     discard
   #!fmt: on
 
-  if false:
-    discard
+  if         false: discard
 
-# Test block comments with trailing comments in fmt off
-proc testBlockComments() =
-  #!fmt: off
-  #[ block comment ]# # trailing comment should stay
-  var   ugly   =   1
-  #[
-    multiline
-    block
-  ]# # also should stay on same line
-  #!fmt: on
-  discard
+#!fmt: off
+#[ block comment ]# # trailing comment should stay
+var   ugly   =   1
+#[
+  multiline
+  block
+]# # also should stay on same line
+#!fmt: on

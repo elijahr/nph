@@ -6,3 +6,8 @@ nimble.paths
 playground/
 *.dSYM/
 /tests/test_formatter
+
+# Ignore .nph.yaml debug files except in test fixtures
+*.nph.yaml
+!/tests/before/*.nph.yaml
+!/tests/after/*.nph.yaml

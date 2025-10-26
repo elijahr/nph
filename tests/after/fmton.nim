@@ -22,14 +22,11 @@ block:
   if false:
     discard
 
-# Test block comments with trailing comments in fmt off
-proc testBlockComments() =
-  #!fmt: off
-  #[ block comment ]# # trailing comment should stay
-  var   ugly   =   1
-  #[
-    multiline
-    block
-  ]# # also should stay on same line
-  #!fmt: on
-  discard
+#!fmt: off
+#[ block comment ]# # trailing comment should stay
+var   ugly   =   1
+#[
+  multiline
+  block
+]# # also should stay on same line
+#!fmt: on
