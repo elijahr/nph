@@ -11,22 +11,22 @@ jobs:
       fail-fast: false
       matrix:
         target:
-          - os: linux
-            name: linux_x64
-          - os: macosx
-            name: macosx_x64
-          - os: windows
-            name: windows_x64
+        - os: linux
+          name: linux_x64
+        - os: macosx
+          name: macosx_x64
+        - os: windows
+          name: windows_x64
         include:
-          - target:
-              os: linux
-            builder: ubuntu-22.04
-          - target:
-              os: macosx
-            builder: macos-13
-          - target:
-              os: windows
-            builder: windows-2019
+        - target:
+            os: linux
+          builder: ubuntu-22.04
+        - target:
+            os: macosx
+          builder: macos-13
+        - target:
+            os: windows
+          builder: windows-2019
     defaults:
       run:
         shell: bash
@@ -34,26 +34,26 @@ jobs:
     name: CI '${{ matrix.target.name }}'
     runs-on: ${{ matrix.builder }}
     steps:
-      - name: Set git to use LF
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-      - name: Checkout
-        uses: actions/checkout@v4
+    - name: Set git to use LF
+      run: |
+        git config --global core.autocrlf false
+        git config --global core.eol lf
+    - name: Checkout
+      uses: actions/checkout@v4
 
-      - uses: nim-lang/setup-nimble-action@v1
-        with:
-          nimble-version: '0.16.4'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: nim-lang/setup-nimble-action@v1
+      with:
+        nimble-version: 0.16.4
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build nph
-        run: |
-           nimble build
+    - name: Build nph
+      run: |
+        nimble build
 
-      - name: Run tests
-        run: |
-          nimble test
+    - name: Run tests
+      run: |
+        nimble test
 
-      - name: Check self formatting
-        run: |
-          ./nph --check --diff .
+    - name: Check self formatting
+      run: |
+        ./nph --check --diff .

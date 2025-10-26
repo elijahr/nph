@@ -1,4 +1,5 @@
-proc      getsFormatted(a, b : int    ) = discard
+proc getsFormatted(a, b: int) =
+  discard
 
 #!fmt: off
 let
@@ -9,9 +10,8 @@ let
     [1, 2, 3]
 
 #!fmt: on
-proc hanging(indent: int,
-             isUgly = true) = discard
-
+proc hanging(indent: int, isUgly = true) =
+  discard
 
 block:
   #!fmt: off
@@ -19,7 +19,7 @@ block:
     discard
   #!fmt: on
 
-  if   false   :
+  if false:
     discard
 
 # Test block comments with trailing comments in fmt off

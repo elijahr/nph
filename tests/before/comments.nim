@@ -14,7 +14,6 @@
 # Comment
 #
 
-
 #[ a multiline comment
 this is also part of it
 and this
@@ -31,21 +30,25 @@ and this
 ]#
 
 # Test block comment followed by single-line comment on same line
-#[ block comment ]# # trailing comment
-##[ doc block comment ]## # trailing doc comment
+#[ block comment ]#
+# trailing comment
+##[ doc block comment ]##
+# trailing doc comment
 
 # Test with actual multiline block comments
 #[
   multiline
   block comment
-]# # trailing comment should stay on same line
+]#
+# trailing comment should stay on same line
 
 ##[
   multiline doc
   block comment
-]## # trailing doc comment on same line
+]##
+# trailing doc comment on same line
 
-template x =
+template x() =
   ## A template doc comment
   try:
     discard
@@ -58,42 +61,46 @@ type
   LonelyObject* = object
 
 type
-  SingleValueSetting* {.pure.} = enum ## \
-                      ## settings resulting in a single string value
-    arguments,        ## experimental: the arguments passed after '-r'
-    backend           ## the backend (eg: c|cpp|objc|js); both `nim doc --backend:js`
-                      ## and `nim js` would imply backend=js
+  SingleValueSetting* {.pure.} = enum
+    ## \
+    ## settings resulting in a single string value
+    arguments ## experimental: the arguments passed after '-r'
+    backend
+      ## the backend (eg: c|cpp|objc|js); both `nim doc --backend:js`
+      ## and `nim js` would imply backend=js
     gc {.deprecated.} ## gc selected
-    mm                ## memory management selected
+    mm ## memory management selected
 
   FileSeekPos* = enum
     fspEnd ## Seek relative to end
     # text file handling:
+
   ## Position relative to which seek should happen.
   # The values are ordered so that they match with stdio
   # SEEK_SET, SEEK_CUR and SEEK_END respectively.
-
-  Object = object # comment
+  Object = object
+    # comment
     ## more comment
     field: int # Field comment
     # comment between fields
     field2: int ## Field comment again
-    fiiiiiiiiiiiiiiiiiiiiiiiieeeeeeeeeld: int # loooooooooooooooooooong comment past the max line length
+    fiiiiiiiiiiiiiiiiiiiiiiiieeeeeeeeeld: int
+      # loooooooooooooooooooong comment past the max line length
 
     docfield, ## Doc comment after comma
       docfield2, ## Doc comment again
-                 ## Multiline
+        ## Multiline
       docfield3: int ## here came the type
-  # and here
 
+  # and here
   NewlineObject = object
     field: int ## doc comment after field
     ## doc comment continues, though not as a postfix - empty line after
-
     field2: int ## just a doc again
 
-  Inherited = object of RootObj # inherited eol comment
-                                # inherited next line indent comments
+  Inherited = object of RootObj
+    # inherited eol comment
+    # inherited next line indent comments
     f: int
 
   CaseObject = object # caseobj eol
@@ -101,17 +108,19 @@ type
     of true, false: # of eol
       v: string # case field eol
 
-  SomeAlias* = int ## alias eol
+  SomeAlias* = int
+    ## alias eol
     ## alias next
 
-  SomeAlias2 {.nodecl.} # after pragma
-    = int ## alias2 eol
+  SomeAlias2 {.nodecl.} = # after pragma
+    int ## alias2 eol
 
   SomeAlias3 # alias after symbol
     [T] = # alias after equals
-    int # alias after type
+      int # alias after type
 
-  SomeAlias4 = SomeAlias3[int] ## after alias4
+  SomeAlias4 = SomeAlias3[int]
+    ## after alias4
     ## more after alias4
 
   SomeAlias5 = ## doc comment after equals before proc
@@ -119,7 +128,7 @@ type
     proc(v: int)
 
   SomeAlias6 = ##
-      ## doc comment after equals before proc continued
+    ## doc comment after equals before proc continued
     proc(v: int)
 
   ## Some comment before whenobj
@@ -127,16 +136,19 @@ type
     when false: # when object false line
       discard
 
-  NoField0* = object of RootObj ## comment eol
-                                ## comment nl
+  NoField0* = object of RootObj
+    ## comment eol
+    ## comment nl
 
-  NoField1* = object of RootObj ## comment nofield1 eol
-                                ## comment nl
+  NoField1* = object of RootObj
+    ## comment nofield1 eol
+    ## comment nl
 
-  CommentedTuple* = tuple
-    ## Comment here
-    field: int ## comment tuple field
-    field2: int ## comment tuple field2
+  CommentedTuple* =
+    tuple
+      ## Comment here
+      field: int ## comment tuple field
+      field2: int ## comment tuple field2
 
   CommentedTuple2* =
     tuple
@@ -174,7 +186,7 @@ else: # else colon line
   discard
 
 if true:
-# if dedented colon line
+  # if dedented colon line
   discard
 # before else dedented
 else: # else colon line
@@ -198,20 +210,19 @@ finally: # Finally colon line
   # finally last line
 
 try:
-# try first dedent line
+  # try first dedent line
   f()
 # try last dedent line
 except:
-# except dedent first line
+  # except dedent first line
   discard
 # except dedent last line
 finally:
-# finally first dedent line
+  # finally first dedent line
   discard
 # finally last dedent line
 
-
-for i in 0..1: # for colon line
+for i in 0 .. 1: # for colon line
   # for first line
   discard
 
@@ -223,7 +234,7 @@ else: # case else colon line
   # case else first line
   discard
 
-f do -> int: # do colon line
+f do() -> int: # do colon line
   # do first line
   discard
   discard
@@ -248,9 +259,10 @@ static: # static colon line
 discard Object( # object eol
   # object first line
   field: 0, # field line
-  field2: # field colon line
+  field2:
+    # field colon line
     # Field colon next line
-    42
+    42,
 )
 
 a = b
@@ -263,7 +275,7 @@ block:
 ## needs to be double
 
 abc and
-# dedented comment in infix
+  # dedented comment in infix
   def
 
 abc and
@@ -271,24 +283,26 @@ abc and
   def
 
 if abc and
-# dedented comment in infix
-   def: discard
+    # dedented comment in infix
+    def:
+  discard
 
 if abc and
-   # indented comment in infix
-   def: discard
+    # indented comment in infix
+    def:
+  discard
 
 a(
   b = c # comment after keyword parameter
 )
 
 a(
-  b = c
-# dedented comment after keyword parameter
+  b = c # dedented comment after keyword parameter
 )
 
-{.pragma # comment here
- .}
+{.
+  pragma # comment here
+.}
 
 let v = 52 # let all on one line
 let v = addr output # let all on one line with command
@@ -303,16 +317,20 @@ var
 
 let # let eol
   v # let ident after symbol
- : # let ident after colon
-    int # let ident after type
- = # let ident after equals
+  :
+    # let ident after colon
+    int =
+    # let ident after type
+    # let ident after equals
     42 # let ident after value
 
 const # const eol
   v # const ident after symbol
- : # const ident after colon
-    int # const ident after type
- = # const ident after equals
+  :
+    # const ident after colon
+    int =
+    # const ident after type
+    # const ident after equals
     42 # const ident after value
 
 let
@@ -325,20 +343,22 @@ const
   b = 5
   # const section postfix
 
-discard # discard eol
+discard
+  # discard eol
   # discard first line
   54 # discard value
 
-proc x = discard # proc, impl and comment on one line
+proc x() =
+  discard # proc, impl and comment on one line
 
-proc # after proc before indented name
-  xxx = discard
+proc xxx() = # after proc before indented name
+  discard
 
-proc xxxx = # proc eq line
+proc xxxx() = # proc eq line
   # proc first line
   discard
 
-proc x =
+proc x() =
   ## A proc doc comment
   if true:
     numberOfCharsRead -= 2 # handle Ctrl+Z as EOF
@@ -346,20 +366,22 @@ proc x =
     for i in 0 ..< numberOfCharsRead:
       discard
 
-proc x = discard
+proc x() =
   ## indented doc comment for proc
   ## that is long
+  discard
 
-proc x = echo a.b
+proc x() =
   ## indented doc comment for proc
   ## with a dotexpr and a command
+  echo a.b
 
-proc f: bool =
+proc f(): bool =
   ## Comment here
   ## another
   (true or false)
 
-proc f: bool =
+proc f(): bool =
   ## Comment here
   ## another
   if true:
@@ -374,22 +396,28 @@ proc f: bool =
     else:
       false
 
-proc f =
+proc f() =
   ## Doc comment only
 
-proc f =
+proc f() =
   ## Doc comment only
   ## even two lines
 
-proc a(v#[block]#: int, abc: int)
+proc a(
+  v #[block]#
+  : int,
+  abc: int,
+)
 
-proc a(): int = 42
+proc a(): int =
   ## Doc comment that needs body reordering
   ## even two lines again
+  42
 
 proc a(
-  param: int, ## doc comment here
-) = discard
+    param: int, ## doc comment here
+) =
+  discard
 
 command "a", "b", "c" # command eol comment
 
@@ -400,8 +428,7 @@ command "first arg", # first arg comment
 command "first arg"
 # comment after command
 
-command 234
-  # command after ind
+command 234 # command after ind
 
 when false:
   command "first arg"
@@ -427,13 +454,13 @@ dotexpr
 if true:
   echo dotexpr.dot # after dotexpr in command ind
   # between two dotepxrs ind
+
   dotexpr
   # between dotexpr and dotonnewline ind
   .dotonnewline
 
 block:
-  f
-  .x
+  f.x
   # comment between the dots
   .z()
   # also after call
@@ -441,16 +468,10 @@ block:
 
   # after dotexpr ind
 
-
-
 block:
   # no whitespace between the next two multilines
-  functionCall(
-    param
-  )
-  functionCall(
-    param
-  )
+  functionCall(param)
+  functionCall(param)
 
 block:
   if true:
@@ -459,7 +480,8 @@ block:
 
 discard
   # infix pre par
-  ( # infix parle
+  (
+    # infix parle
     # infix prefix
     a and # infix post-operator
     b # infix post
@@ -471,40 +493,27 @@ block:
   # dedented comment post discard
 
 block:
-  if  # some conditions:
-    2 >= 1 and
-    2 >= 1 and
-    2 >= 1:
+  if 2 >= 1 and 2 >= 1 and 2 >= 1: # some conditions:
     discard
-  elif # some elif conds
-    2 >= 1 and
-    2 >= 1 and
-    2 >= 1:
+  elif 2 >= 1 and 2 >= 1 and 2 >= 1: # some elif conds
     discard
 
-  if  # some conditions with a very long comment that wont fit on a line abacacsdcasdcasdsdcsdcsdc
-    2 >= 1 and
-    2 >= 1 and
-    2 >= 1:
+  if 2 >= 1 and 2 >= 1 and 2 >= 1:
+    # some conditions with a very long comment that wont fit on a line abacacsdcasdcasdsdcsdcsdc
     discard
 
-  if
-    2 >= 1 and
-    # some conditions
-    2 >= 1 and
-    2 >= 1:
+  if 2 >= 1 and
+      # some conditions
+      2 >= 1 and 2 >= 1:
     discard
 
-  while  # some conditions:
-    2 >= 1 and
-    2 >= 1 and
-    2 >= 1:
+  while 2 >= 1 and 2 >= 1 and 2 >= 1: # some conditions:
     discard
 
-  case # comment
+  case
+  # comment
   true
-  of # comment
-    true:
-      discard
-  else #comment
-    : discard
+  of true: # comment
+    discard
+  else: #comment
+    discard

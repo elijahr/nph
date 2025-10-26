@@ -90,7 +90,8 @@ If the list still doesn't fit on a single line, we look at the contents to
 choose between two styles.
 
 If it contains complex complex values, we render one value per row - this
-happens most often for function parameters and other information-dense constructs.
+happens most often for function parameters and other information-dense
+constructs.
 
 ```nim
 import

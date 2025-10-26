@@ -28,11 +28,10 @@ else:
 static:
   doAssert NimMajor == 2 and NimMinor == 2, "nph needs a specific version of Nim"
 
-type
-  NphConfig = object
-    exclude: seq[string]
-    extendExclude: seq[string]
-    includePatterns: seq[string]
+type NphConfig = object
+  exclude: seq[string]
+  extendExclude: seq[string]
+  includePatterns: seq[string]
 
 const
   Version = gorge("git describe --long --dirty --always --tags")
@@ -56,26 +55,9 @@ Options:
   --help                show this help
 """
   DefaultExcludePatterns = [
-    r"\.git",
-    r"\.hg",
-    r"\.svn",
-    r"\.nimble",
-    r"nimcache",
-    r"\.vscode",
-    r"\.idea",
-    r"__pycache__",
-    r"node_modules",
-    r"\.mypy_cache",
-    r"\.pytest_cache",
-    r"\.nox",
-    r"\.tox",
-    r"\.venv",
-    r"venv",
-    r"\.eggs",
-    r"_build",
-    r"buck-out",
-    r"build",
-    r"dist",
+    r"\.git", r"\.hg", r"\.svn", r"\.nimble", r"nimcache", r"\.vscode", r"\.idea",
+    r"__pycache__", r"node_modules", r"\.mypy_cache", r"\.pytest_cache", r"\.nox",
+    r"\.tox", r"\.venv", r"venv", r"\.eggs", r"_build", r"buck-out", r"build", r"dist",
   ]
   DefaultIncludePattern = r"\.nim(s|ble)?$"
   ErrCheckFailed = 1
@@ -110,11 +92,7 @@ proc makeConfigRef(): ConfigRef =
   conf
 
 proc loadConfig(configFile: string): NphConfig =
-  result = NphConfig(
-    exclude: @[],
-    extendExclude: @[],
-    includePatterns: @[],
-  )
+  result = NphConfig(exclude: @[], extendExclude: @[], includePatterns: @[])
 
   if not fileExists(configFile):
     return
@@ -326,7 +304,7 @@ proc main() =
   var
     outfile, outdir, configFile: string
     infiles = newSeq[string]()
-    explicitFiles = newSeq[string]()  # Files passed explicitly, not from dir walk
+    explicitFiles = newSeq[string]() # Files passed explicitly, not from dir walk
     outfiles = newSeq[string]()
     debug = false
     check = false
@@ -353,7 +331,7 @@ proc main() =
       else:
         let f = key.addFileExt(".nim")
         infiles.add(f)
-        explicitFiles.add(f)  # Track explicitly passed files
+        explicitFiles.add(f) # Track explicitly passed files
     of cmdLongOption, cmdShortOption:
       case normalize(key)
       of "help", "h":
@@ -389,7 +367,7 @@ proc main() =
       of "":
         let f = "-"
         infiles.add(f)
-        explicitFiles.add(f)  # stdin is explicit
+        explicitFiles.add(f) # stdin is explicit
       else:
         writeHelp()
     of cmdEnd:
@@ -478,12 +456,9 @@ proc main() =
 
     # Track statistics for summary
     case err
-    of QuitSuccess:
-      filesUnchanged.inc
-    of ErrCheckFailed, ErrDiffChanges:
-      filesReformatted.inc
-    else:
-      filesErrored.inc
+    of QuitSuccess: filesUnchanged.inc
+    of ErrCheckFailed, ErrDiffChanges: filesReformatted.inc
+    else: filesErrored.inc
 
     # Keep going to show all diffs/errors instead of failing fast
     res = max(res, err)

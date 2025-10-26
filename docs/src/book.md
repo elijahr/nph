@@ -1,6 +1,7 @@
 # Updating this book
 
-The book is built using [mdBook](https://github.com/rust-lang/mdBook), and published to gh-pages using a github action.
+The book is built using [mdBook](https://github.com/rust-lang/mdBook), and
+published to gh-pages using a github action.
 
 ```bash
 # Install or update tooling (make sure you add "~/.cargo/bin" to PATH):

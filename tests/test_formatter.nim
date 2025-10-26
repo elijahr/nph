@@ -27,7 +27,8 @@ suite "formatter tests":
         skip()
 
       # Format the before file
-      let (output, exitCode) = execCmdEx(nphBin & " " & beforeFile & " --out:" & tmpFile)
+      let (output, exitCode) =
+        execCmdEx(nphBin & " " & beforeFile & " --out:" & tmpFile)
 
       check exitCode == 0
       if exitCode != 0:
@@ -40,9 +41,8 @@ suite "formatter tests":
 
       if formatted != expected:
         # Show diff for nice output
-        let (diffOutput, _) = execCmdEx(
-          "diff -u " & afterFile & " " & tmpFile & " || true"
-        )
+        let (diffOutput, _) =
+          execCmdEx("diff -u " & afterFile & " " & tmpFile & " || true")
         echo "\n" & diffOutput
 
       check formatted == expected
@@ -76,8 +76,7 @@ suite "--diff mode":
       beforeFile2 = testsDir / "before/comments.nim"
       afterFile = testsDir / "after/fmton.nim"
       (output, exitCode) = execCmdEx(
-        nphBin & " --diff " & beforeFile1 & " " & beforeFile2 & " " & afterFile &
-          " 2>&1"
+        nphBin & " --diff " & beforeFile1 & " " & beforeFile2 & " " & afterFile & " 2>&1"
       )
 
     check exitCode == 0
@@ -88,9 +87,8 @@ suite "--diff mode":
   test "--diff rejects --out":
     let
       beforeFile = testsDir / "before/fmton.nim"
-      (output, exitCode) = execCmdEx(
-        nphBin & " --diff --out:/tmp/test.nim " & beforeFile & " 2>&1"
-      )
+      (output, exitCode) =
+        execCmdEx(nphBin & " --diff --out:/tmp/test.nim " & beforeFile & " 2>&1")
 
     check exitCode == 3
     check "diff cannot be used with out or outDir" in output
@@ -98,9 +96,8 @@ suite "--diff mode":
   test "--diff rejects --outDir":
     let
       beforeFile = testsDir / "before/fmton.nim"
-      (output, exitCode) = execCmdEx(
-        nphBin & " --diff --outDir:/tmp " & beforeFile & " 2>&1"
-      )
+      (output, exitCode) =
+        execCmdEx(nphBin & " --diff --outDir:/tmp " & beforeFile & " 2>&1")
 
     check exitCode == 3
     check "diff cannot be used with out or outDir" in output
@@ -154,9 +151,7 @@ suite "--diff --check mode":
   test "--diff --check shows diff and exits 1 when formatting needed":
     let
       beforeFile = testsDir / "before/fmton.nim"
-      (output, exitCode) = execCmdEx(
-        nphBin & " --diff --check " & beforeFile & " 2>&1"
-      )
+      (output, exitCode) = execCmdEx(nphBin & " --diff --check " & beforeFile & " 2>&1")
 
     check exitCode == 1
     check "--- tests/before/fmton.nim" in output
@@ -167,9 +162,7 @@ suite "--diff --check mode":
   test "--diff --check exits 0 when no formatting needed":
     let
       afterFile = testsDir / "after/fmton.nim"
-      (output, exitCode) = execCmdEx(
-        nphBin & " --diff --check " & afterFile & " 2>&1"
-      )
+      (output, exitCode) = execCmdEx(nphBin & " --diff --check " & afterFile & " 2>&1")
 
     check exitCode == 0
     check "---" notin output
@@ -215,9 +208,8 @@ suite "write mode (default)":
       tmpFile = "/tmp/nph_out_test.nim"
       afterFile = testsDir / "after/fmton.nim"
       contentBefore = readFile(beforeFile)
-      (_, exitCode) = execCmdEx(
-        nphBin & " " & beforeFile & " --out:" & tmpFile & " 2>&1"
-      )
+      (_, exitCode) =
+        execCmdEx(nphBin & " " & beforeFile & " --out:" & tmpFile & " 2>&1")
       formatted = readFile(tmpFile)
       expected = readFile(afterFile)
       contentAfter = readFile(beforeFile)
@@ -229,8 +221,7 @@ suite "write mode (default)":
 
 suite "error handling":
   test "invalid syntax exits with error code":
-    let
-      tmpFile = "/tmp/nph_invalid.nim"
+    let tmpFile = "/tmp/nph_invalid.nim"
 
     writeFile(tmpFile, "proc invalid syntax here")
 
@@ -254,9 +245,8 @@ suite "error handling":
     writeFile(tmpInvalidFile, "proc invalid syntax")
     copyFile(beforeFile, tmpValidFile)
 
-    let (output, exitCode) = execCmdEx(
-      nphBin & " " & tmpInvalidFile & " " & tmpValidFile & " 2>&1"
-    )
+    let (output, exitCode) =
+      execCmdEx(nphBin & " " & tmpInvalidFile & " " & tmpValidFile & " 2>&1")
 
     check exitCode == 3
     check "cannot be parsed" in output
@@ -270,9 +260,8 @@ suite "summary messages":
     let
       beforeFile1 = testsDir / "before/fmton.nim"
       beforeFile2 = testsDir / "before/comments.nim"
-      (output, exitCode) = execCmdEx(
-        nphBin & " --check " & beforeFile1 & " " & beforeFile2 & " 2>&1"
-      )
+      (output, exitCode) =
+        execCmdEx(nphBin & " --check " & beforeFile1 & " " & beforeFile2 & " 2>&1")
 
     check exitCode == 1
     check "Oh no! 💥 🚧 💥" in output
@@ -283,9 +272,8 @@ suite "summary messages":
     let
       afterFile1 = testsDir / "after/fmton.nim"
       afterFile2 = testsDir / "after/comments.nim"
-      (output, exitCode) = execCmdEx(
-        nphBin & " --check " & afterFile1 & " " & afterFile2 & " 2>&1"
-      )
+      (output, exitCode) =
+        execCmdEx(nphBin & " --check " & afterFile1 & " " & afterFile2 & " 2>&1")
 
     check exitCode == 0
     check "Oh no!" notin output
@@ -297,8 +285,7 @@ suite "summary messages":
       afterFile1 = testsDir / "after/comments.nim"
       afterFile2 = testsDir / "after/style.nim"
       (output, exitCode) = execCmdEx(
-        nphBin & " --check " & beforeFile & " " & afterFile1 & " " & afterFile2 &
-          " 2>&1"
+        nphBin & " --check " & beforeFile & " " & afterFile1 & " " & afterFile2 & " 2>&1"
       )
 
     check exitCode == 1
@@ -321,7 +308,8 @@ suite "stdin handling":
       afterFile = testsDir / "after/fmton.nim"
       input = readFile(beforeFile)
       expected = readFile(afterFile)
-      (output, exitCode) = execCmdEx("echo '" & input & "' | " & nphBin & " - 2>/dev/null")
+      (output, exitCode) =
+        execCmdEx("echo '" & input & "' | " & nphBin & " - 2>/dev/null")
 
     check exitCode == 0
     check expected in output
@@ -330,9 +318,8 @@ suite "stdin handling":
     let
       beforeFile = testsDir / "before/fmton.nim"
       input = readFile(beforeFile)
-      (output, exitCode) = execCmdEx(
-        "echo '" & input & "' | " & nphBin & " --diff - 2>&1"
-      )
+      (output, exitCode) =
+        execCmdEx("echo '" & input & "' | " & nphBin & " --diff - 2>&1")
 
     check exitCode == 0
     check "--- -" in output
@@ -342,9 +329,8 @@ suite "stdin handling":
     let
       beforeFile = testsDir / "before/fmton.nim"
       input = readFile(beforeFile)
-      (output, exitCode) = execCmdEx(
-        "echo '" & input & "' | " & nphBin & " --check - 2>&1"
-      )
+      (output, exitCode) =
+        execCmdEx("echo '" & input & "' | " & nphBin & " --check - 2>&1")
 
     check exitCode == 1
     check "would reformat -" in output
@@ -361,9 +347,8 @@ suite "--outDir option":
     createDir(tmpDir)
 
     let
-      (_, exitCode) = execCmdEx(
-        nphBin & " " & beforeFile & " --outDir:" & tmpDir & " 2>&1"
-      )
+      (_, exitCode) =
+        execCmdEx(nphBin & " " & beforeFile & " --outDir:" & tmpDir & " 2>&1")
       formatted = readFile(outFile)
       expected = readFile(afterFile)
       contentAfter = readFile(beforeFile)
@@ -384,8 +369,7 @@ suite "--outDir option":
     createDir(tmpDir)
 
     let (_, exitCode) = execCmdEx(
-      nphBin & " " & beforeFile1 & " " & beforeFile2 & " --outDir:" & tmpDir &
-        " 2>&1"
+      nphBin & " " & beforeFile1 & " " & beforeFile2 & " --outDir:" & tmpDir & " 2>&1"
     )
 
     check exitCode == 0
@@ -396,9 +380,8 @@ suite "--outDir option":
   test "--outDir rejects --out":
     let
       beforeFile = testsDir / "before/fmton.nim"
-      (output, exitCode) = execCmdEx(
-        nphBin & " " & beforeFile & " --outDir:/tmp --out:/tmp/test.nim 2>&1"
-      )
+      (output, exitCode) =
+        execCmdEx(nphBin & " " & beforeFile & " --outDir:/tmp --out:/tmp/test.nim 2>&1")
 
     check exitCode == 3
     check "out and outDir cannot both be specified" in output
@@ -455,9 +438,8 @@ suite "directory recursion":
     createDir(tmpDir)
     writeFile(tmpFile, "proc test() = discard\n")
 
-    let (output, exitCode) = execCmdEx(
-      nphBin & " " & tmpDir & " --out:/tmp/test.nim 2>&1"
-    )
+    let (output, exitCode) =
+      execCmdEx(nphBin & " " & tmpDir & " --out:/tmp/test.nim 2>&1")
 
     check exitCode == 3
     check "out cannot be used alongside directories" in output
@@ -574,14 +556,10 @@ suite "exclude/include patterns":
 
     createDir(tmpDir / "excluded")
     writeFile(file1, "proc test() = discard\n")
-    writeFile(
-      configFile,
-      "extend-exclude = [\"excluded\"]\n",
-    )
+    writeFile(configFile, "extend-exclude = [\"excluded\"]\n")
 
-    let (output, exitCode) = execCmdEx(
-      nphBin & " --check --config:" & configFile & " " & file1 & " 2>&1"
-    )
+    let (output, exitCode) =
+      execCmdEx(nphBin & " --check --config:" & configFile & " " & file1 & " 2>&1")
 
     check exitCode == 1
     check "would reformat" in output
@@ -599,14 +577,10 @@ suite "config file":
     createDir(tmpDir / "build")
     writeFile(file1, "proc test() = discard\n")
     writeFile(file2, "proc test() = discard\n")
-    writeFile(
-      configFile,
-      "extend-exclude = [\"build\"]\n",
-    )
+    writeFile(configFile, "extend-exclude = [\"build\"]\n")
 
-    let (output, _) = execCmdEx(
-      nphBin & " --check --config:" & configFile & " " & tmpDir & " 2>&1"
-    )
+    let (output, _) =
+      execCmdEx(nphBin & " --check --config:" & configFile & " " & tmpDir & " 2>&1")
 
     check "src/test.nim" in output
     check "build/test.nim" notin output
@@ -626,14 +600,11 @@ suite "config file":
     writeFile(file1, "proc test() = discard\n")
     writeFile(file2, "proc test() = discard\n")
     writeFile(file3, "proc test() = discard\n")
-    writeFile(
-      configFile,
-      "extend-exclude = [\"src\"]\n",
-    )
+    writeFile(configFile, "extend-exclude = [\"src\"]\n")
 
     let (output, _) = execCmdEx(
-      nphBin & " --check --config:" & configFile & " --extend-exclude='build' " &
-        tmpDir & " 2>&1"
+      nphBin & " --check --config:" & configFile & " --extend-exclude='build' " & tmpDir &
+        " 2>&1"
     )
 
     # Both src (from config) and build (from CLI) should be excluded
@@ -651,9 +622,8 @@ suite "config file":
     createDir(tmpDir)
     writeFile(file1, "proc test() = discard\n")
 
-    let (output, exitCode) = execCmdEx(
-      nphBin & " --check --config:/nonexistent.toml " & tmpDir & " 2>&1"
-    )
+    let (output, exitCode) =
+      execCmdEx(nphBin & " --check --config:/nonexistent.toml " & tmpDir & " 2>&1")
 
     check exitCode == 1
     check "test.nim" in output
@@ -671,9 +641,7 @@ suite "color output":
   test "--diff --color produces ANSI codes":
     let
       beforeFile = testsDir / "before/fmton.nim"
-      (output, exitCode) = execCmdEx(
-        nphBin & " --diff --color " & beforeFile & " 2>&1"
-      )
+      (output, exitCode) = execCmdEx(nphBin & " --diff --color " & beforeFile & " 2>&1")
 
     check exitCode == 0
     # Check for ANSI escape codes
@@ -695,9 +663,8 @@ suite "color output":
   test "--no-color explicitly disables color":
     let
       beforeFile = testsDir / "before/fmton.nim"
-      (output, exitCode) = execCmdEx(
-        nphBin & " --diff --no-color " & beforeFile & " 2>&1"
-      )
+      (output, exitCode) =
+        execCmdEx(nphBin & " --diff --no-color " & beforeFile & " 2>&1")
 
     check exitCode == 0
     check "\x1B[" notin output
@@ -705,9 +672,7 @@ suite "color output":
   test "--diff --color shows colored headers":
     let
       beforeFile = testsDir / "before/fmton.nim"
-      (output, exitCode) = execCmdEx(
-        nphBin & " --diff --color " & beforeFile & " 2>&1"
-      )
+      (output, exitCode) = execCmdEx(nphBin & " --diff --color " & beforeFile & " 2>&1")
 
     check exitCode == 0
     # Headers should be bold

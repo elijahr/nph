@@ -25,7 +25,8 @@ echo "echo 1" | nph -
 
 ## Configuration file
 
-You can configure `nph` using a `.nph.toml` file in your project root. CLI options override config file settings.
+You can configure `nph` using a `.nph.toml` file in your project root. CLI
+options override config file settings.
 
 ```toml
 # Completely replace default exclusions with your own patterns
@@ -49,7 +50,8 @@ include = [
 
 ### Default exclusions
 
-By default, `nph` excludes common directories that typically don't contain source code:
+By default, `nph` excludes common directories that typically don't contain
+source code:
 
 - `.git`, `.hg`, `.svn` - version control
 - `.nimble`, `nimcache` - Nim build artifacts
@@ -59,7 +61,8 @@ By default, `nph` excludes common directories that typically don't contain sourc
 - `node_modules` - JavaScript dependencies
 - `_build`, `buck-out`, `build`, `dist` - common build directories
 
-Use `extend-exclude` to add to these defaults, or `exclude` to replace them entirely.
+Use `extend-exclude` to add to these defaults, or `exclude` to replace them
+entirely.
 
 ## CLI options
 
@@ -67,7 +70,8 @@ Use `extend-exclude` to add to these defaults, or `exclude` to replace them enti
 
 #### `--exclude:pattern`
 
-Completely replaces the default exclusion patterns with your own regex pattern. Can be specified multiple times.
+Completely replaces the default exclusion patterns with your own regex pattern.
+Can be specified multiple times.
 
 ```sh
 # Only exclude the build directory
@@ -76,7 +80,9 @@ nph --exclude:build src/
 
 #### `--extend-exclude:pattern`
 
-Adds a regex pattern to the default exclusions. Can be specified multiple times. This is typically more useful than `--exclude` since you keep the sensible defaults.
+Adds a regex pattern to the default exclusions. Can be specified multiple times.
+This is typically more useful than `--exclude` since you keep the sensible
+defaults.
 
 ```sh
 # Exclude vendor directory in addition to defaults
@@ -85,14 +91,16 @@ nph --extend-exclude:vendor src/
 
 #### `--include:pattern`
 
-Only format files matching this regex pattern. Can be specified multiple times. Default is `\.nim(s|ble)?$`.
+Only format files matching this regex pattern. Can be specified multiple times.
+Default is `\.nim(s|ble)?$`.
 
 ```sh
 # Only format .nim files (not .nims or .nimble)
 nph --include:'\.nim$' src/
 ```
 
-**Note**: Files passed explicitly on the command line bypass all filtering (matching Black's behavior):
+**Note**: Files passed explicitly on the command line bypass all filtering
+(matching Black's behavior):
 
 ```sh
 # This WILL format vendor/foo.nim even if vendor is excluded
@@ -103,17 +111,20 @@ nph vendor/foo.nim
 
 #### `--diff`
 
-Show a unified diff of formatting changes without modifying files. Useful for previewing changes or in CI to see what would be reformatted.
+Show a unified diff of formatting changes without modifying files. Useful for
+previewing changes or in CI to see what would be reformatted.
 
 ```sh
 nph --diff src/myfile.nim
 ```
 
-Exit code is 0 even if changes are found (informational mode). Combine with `--check` to make it fail on changes.
+Exit code is 0 even if changes are found (informational mode). Combine with
+`--check` to make it fail on changes.
 
 #### `--check`
 
-Check if files are formatted correctly without modifying them. Exits with code 1 if any file would be reformatted. Perfect for CI pipelines.
+Check if files are formatted correctly without modifying them. Exits with code 1
+if any file would be reformatted. Perfect for CI pipelines.
 
 ```sh
 nph --check src/
@@ -127,7 +138,8 @@ nph --check --diff src/
 
 #### `--color` / `--no-color`
 
-Enable or disable colored diff output. Only works with `--diff`. Default is `--no-color`.
+Enable or disable colored diff output. Only works with `--diff`. Default is
+`--no-color`.
 
 ```sh
 # Show colored diff
@@ -149,7 +161,8 @@ nph --config:custom.toml src/
 
 ## Integration with pre-commit
 
-`nph` can be integrated with [pre-commit](https://pre-commit.com/) to automatically format Nim files before committing.
+`nph` can be integrated with [pre-commit](https://pre-commit.com/) to
+automatically format Nim files before committing.
 
 Add this to your `.pre-commit-config.yaml`:
 
@@ -166,7 +179,8 @@ This will automatically format your Nim files on commit.
 ### Available hooks
 
 - `nph` - Formats files in-place (default behavior)
-- `nph-check` - Checks formatting without modifying files, shows diff of needed changes (useful in CI)
+- `nph-check` - Checks formatting without modifying files, shows diff of needed
+  changes (useful in CI)
 
 Example using check-only mode:
 
@@ -189,11 +203,15 @@ repos:
         args: [--check, --diff, --color]
 ```
 
-**Note**: This requires `nph` to be installed on your system. The hook uses `language: system`, which means it will use your globally installed `nph` binary.
+**Note**: This requires `nph` to be installed on your system. The hook uses
+`language: system`, which means it will use your globally installed `nph`
+binary.
 
 ## Disabling formatting locally
 
-You can mark a code section with `#!fmt: off` and `#!fmt: on` to disable formatting locally:
+You can mark a code section with `#!fmt: off` and `#!fmt: on` to disable
+formatting locally:
+
 ```nim
 proc      getsFormatted(a, b : int    ) = discard
 

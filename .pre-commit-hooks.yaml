@@ -1,13 +1,13 @@
 - id: nph
   name: nph
-  description: 'nph - opinionated Nim code formatter'
+  description: nph - opinionated Nim code formatter
   entry: nph
   language: system
   files: \.nim(s|ble)?$
 
 - id: nph-check
   name: nph (check only)
-  description: 'nph - check Nim code formatting without modifying files'
+  description: nph - check Nim code formatting without modifying files
   entry: nph
   language: system
   files: \.nim(s|ble)?$

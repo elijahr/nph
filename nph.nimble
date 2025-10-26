@@ -1,11 +1,11 @@
 # Package
 
-version       = "0.6.1"
-author        = "Jacek Sieka"
-description   = "Nim code formatter"
-license       = "MIT"
-srcDir        = "src"
-bin           = @["nph"]
+version = "0.6.1"
+author = "Jacek Sieka"
+description = "Nim code formatter"
+license = "MIT"
+srcDir = "src"
+bin = @["nph"]
 
 # Dependencies
 
@@ -15,7 +15,9 @@ bin           = @["nph"]
 # Note that the parser used by the formatter and the parser used by the verifier
 # might disagree if syntax changes are included in a Nim patch version.
 # TODO: nph should learn how to check formatting with any nim version
-requires "nim >= 2.2.0 & < 2.3", "compiler >= 2.2.0 & < 2.3", "hldiff >= 1.0.5 & < 2.0.0", "glob >= 0.11.3 & < 0.12.0", "parsetoml >= 0.7.2 & < 0.8.0"
+requires "nim >= 2.2.0 & < 2.3",
+  "compiler >= 2.2.0 & < 2.3", "hldiff >= 1.0.5 & < 2.0.0", "glob >= 0.11.3 & < 0.12.0",
+  "parsetoml >= 0.7.2 & < 0.8.0"
 
 proc build() =
   exec "nim c --debuginfo -o:nph src/nph"
@@ -27,7 +29,7 @@ task self, "Format nph itself":
   exec "git diff --no-ext-diff --quiet --exit-code"
 
   for file in listFiles("src"):
-    if file.len > 4 and file[^4..^1] == ".nim":
+    if file.len > 4 and file[^4 ..^ 1] == ".nim":
       echo file
       exec "./nph " & file
 
@@ -39,14 +41,11 @@ task f, "Format":
   # Sort tests so that 00_empty always is first, which makes it a convenient
   # experimentation ground :)
   for file in sorted(listFiles(".")):
-    if file.len > 4 and file[^4..^1] == ".nim":
+    if file.len > 4 and file[^4 ..^ 1] == ".nim":
       echo file
       exec "../../nph " & file & " --outDir:../after --debug"
 
-
-proc formatProject(
-  name, url, branch: string, dirs: openArray[string]
-) =
+proc formatProject(name, url, branch: string, dirs: openArray[string]) =
   if not dirExists("playground"):
     mkdir("playground")
   cd "playground/"
@@ -62,14 +61,13 @@ proc formatProject(
     try:
       exec "git ls-files | grep .nim$ | xargs nph"
       exec "git diff"
-    except: discard
+    except:
+      discard
     if dir.len > 0:
       cd ".."
   cd "../.."
 
-proc againProject(
-  name, url, branch: string, dirs: openArray[string]
-) =
+proc againProject(name, url, branch: string, dirs: openArray[string]) =
   if not dirExists("playground"):
     mkdir("playground")
   cd "playground/"
@@ -80,14 +78,13 @@ proc againProject(
     try:
       exec "git ls-files | grep .nim$ | xargs nph"
       exec "git diff"
-    except: discard
+    except:
+      discard
     if dir.len > 0:
       cd ".."
   cd "../.."
 
-proc commitProject(
-  name, url, branch: string, dirs: openArray[string]
-) =
+proc commitProject(name, url, branch: string, dirs: openArray[string]) =
   formatProject(name, url, branch, dirs)
 
   cd "playground/" & name
