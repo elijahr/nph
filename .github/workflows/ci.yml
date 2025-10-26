@@ -56,5 +56,4 @@ jobs:
 
       - name: Check self formatting
         run: |
-          ./nph src
-          git diff --exit-code
+          ./nph --check --diff .

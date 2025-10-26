@@ -1,0 +1,55 @@
+repos:
+  # Use nph's own hook for formatting Nim files
+  - repo: .
+    rev: HEAD
+    hooks:
+      - id: nph
+
+  # General file cleanups
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^tests/(before|after)/.*\.nph\.yaml$
+      - id: end-of-file-fixer
+        exclude: ^tests/(before|after)/.*\.nph\.yaml$
+      - id: check-yaml
+        exclude: ^(tests/(before|after)/.*\.nph\.yaml|.*\.dSYM/.*)$
+      - id: check-toml
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+
+  # Shell script formatting and linting
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: v3.10.0-1
+    hooks:
+      - id: shfmt
+        args: [-i, '2', -ci, -w]
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
+
+  # Markdown formatting
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.19
+    hooks:
+      - id: mdformat
+        additional_dependencies:
+          - mdformat-gfm
+          - mdformat-tables
+        args: [--wrap, '80']
+
+  # YAML formatting
+  - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+    rev: v2.14.0
+    hooks:
+      - id: pretty-format-yaml
+        args: [--autofix, --indent, '2']
+        exclude: ^(tests/(before|after)/.*\.nph\.yaml|.*\.dSYM/.*)$
