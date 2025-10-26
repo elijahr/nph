@@ -4,3 +4,5 @@ nimble.develop
 nimble.paths
 *.exe
 playground/
+*.dSYM/
+/tests/test_formatter

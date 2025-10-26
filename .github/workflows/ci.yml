@@ -50,10 +50,11 @@ jobs:
         run: |
            nimble build
 
-      - name: Check formatting
+      - name: Run tests
         run: |
-          ! ./nph --check tests/before
-          ./nph --check tests/after
+          nimble test
 
+      - name: Check self formatting
+        run: |
           ./nph src
           git diff --exit-code
