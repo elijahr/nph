@@ -527,6 +527,9 @@ proc exprColonEqExprListAux(p: var Parser, endTok: TokType, result: PNode) =
       # item (which is not ideal due to the extra indent, but at least it comes
       # before the closing token this way)
       a.postfix.add move(p.skipped)
+      # Mark the trailing comma
+      if p.tok.tokType == endTok:
+        incl(result.flags, nfTrailingComma)
       break
     elif result.kind == nkPar:
       result.transitionSonsKind(nkTupleConstr)
@@ -2891,3 +2894,4 @@ proc parseString*(
   result = p.parseAll
   closeParser(p)
   setEndInfo()
+
