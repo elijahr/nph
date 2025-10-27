@@ -17,7 +17,7 @@ New features:
 - Files passed explicitly on CLI bypass all exclude filters (matching Black's
   behavior)
 - CLI options override config file settings
-- pre-commit integration support with `nph` and `nph-check` hooks
+- pre-commit integration support with `nph` hook
 
 # 0.6.1
 

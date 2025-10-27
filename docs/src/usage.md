@@ -176,33 +176,6 @@ repos:
 
 This will automatically format your Nim files on commit.
 
-### Available hooks
-
-- `nph` - Formats files in-place (default behavior)
-- `nph-check` - Checks formatting without modifying files, shows diff of needed
-  changes (useful in CI)
-
-Example using check-only mode:
-
-```yaml
-repos:
-  - repo: https://github.com/arnetheduck/nph
-    rev: v0.6.1
-    hooks:
-      - id: nph-check
-```
-
-You can add `--color` to see colored diffs:
-
-```yaml
-repos:
-  - repo: https://github.com/arnetheduck/nph
-    rev: v0.6.1
-    hooks:
-      - id: nph-check
-        args: [--check, --diff, --color]
-```
-
 **Note**: This requires `nph` to be installed on your system. The hook uses
 `language: system`, which means it will use your globally installed `nph`
 binary.

@@ -4,11 +4,3 @@
   entry: nph
   language: system
   files: \.nim(s|ble)?$
-
-- id: nph-check
-  name: nph (check only)
-  description: nph - check Nim code formatting without modifying files
-  entry: nph
-  language: system
-  files: \.nim(s|ble)?$
-  args: [--check, --diff]

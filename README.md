@@ -115,16 +115,7 @@ repos:
       - id: nph
 ```
 
-This will automatically format your Nim files on commit. For check-only mode
-that shows diffs without modifying files (useful in CI), use:
-
-```yaml
-repos:
-  - repo: https://github.com/arnetheduck/nph
-    rev: v0.6.1
-    hooks:
-      - id: nph-check  # Shows --check --diff output
-```
+This will automatically format your Nim files on commit.
 
 **Note**: This requires `nph` to be installed on your system. See
 [installation instructions](https://arnetheduck.github.io/nph/installation.html).
