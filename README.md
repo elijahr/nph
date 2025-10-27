@@ -4,9 +4,10 @@
 take the drudgery of manual formatting out of your coding day.
 
 Following the great tradition of [`black`](https://github.com/psf/black/),
-[`prettier`](https://prettier.io/), [`clang-format`](https://clang.llvm.org/docs/ClangFormat.html)
-and other AST-based formatters, it discards existing styling to create a
-consistent and beautiful codebase.
+[`prettier`](https://prettier.io/),
+[`clang-format`](https://clang.llvm.org/docs/ClangFormat.html) and other
+AST-based formatters, it discards existing styling to create a consistent and
+beautiful codebase.
 
 ## Documentation
 
@@ -33,11 +34,14 @@ nph --check somefile.nim || echo "Not formatted!"
 echo "echo 1" | nph -
 ```
 
-More information about features and style available from the [documentation](https://arnetheduck.github.io/nph/)
+More information about features and style available from the
+[documentation](https://arnetheduck.github.io/nph/)
 
 ## Installation
 
-Binaries are available from the [releases page](https://github.com/arnetheduck/nph/releases/tag/latest) on Github.
+Binaries are available from the
+[releases page](https://github.com/arnetheduck/nph/releases/tag/latest) on
+Github.
 
 `nph` can be also compiled or installed using `nimble` v0.16.4+:
 
@@ -50,14 +54,32 @@ nimble setup -l
 nimble build
 ```
 
-See the [installation instructions](https://arnetheduck.github.io/nph/installation.html) in the manual for more details.
+See the
+[installation instructions](https://arnetheduck.github.io/nph/installation.html)
+in the manual for more details.
 
 ## Editor integration
 
-Editor integrations are described [in the manual](https://arnetheduck.github.io/nph/installation.html#editor-integration).
+Editor integrations are described
+[in the manual](https://arnetheduck.github.io/nph/installation.html#editor-integration).
+
+## Pre-commit integration
+
+You can use `nph` with [pre-commit](https://pre-commit.com/) to automatically
+format your Nim code before committing.
+
+Add this to your `.pre-commit-config.yaml`:
+
+```yaml
+repos:
+  - repo: https://github.com/arnetheduck/nph
+    rev: latest  # Use the ref you want to point at
+    hooks:
+      - id: nph
+```
 
 ## Continuous integration
 
-Check out the [companion Github Action](https://github.com/arnetheduck/nph-action) for a convenient CI option!
-
-
+Check out the
+[companion Github Action](https://github.com/arnetheduck/nph-action) for a
+convenient CI option!
