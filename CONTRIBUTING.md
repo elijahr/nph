@@ -33,14 +33,17 @@ Tests are automatically discovered from the `tests/before/` directory. To add a
 new test:
 
 1. **Create the input file**: `tests/before/my_test.nim`
+
    - This is the unformatted Nim code you want to test
 
 2. **Create the expected output**: `tests/after/my_test.nim`
+
    - This is what nph should produce after formatting
 
 3. **Run tests**: The test will be automatically picked up and run
 
 The test framework automatically:
+
 - Discovers all `*.nim` files in `tests/before/`
 - Formats each file with nph
 - Compares the output to the corresponding file in `tests/after/`
@@ -62,11 +65,13 @@ The test framework automatically:
 nph has two test approaches:
 
 1. **Runtime discovery** (`test_formatter.nim` - current default)
+
    - Scans directory at runtime
    - Easier to debug
    - Used in CI
 
 2. **Compile-time discovery** (`test_formatter_static.nim` - example)
+
    - Uses `staticExec` + macros to generate tests at compile time
    - Automatically busts Nim's cache when files are added/removed
    - Faster execution (no runtime scanning)

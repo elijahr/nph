@@ -1,5 +1,4 @@
-
-exclude: ^(tests/(before|after)/.*|.*\.dSYM/.*)$
+exclude: ^(tests/(before|after|expected_output)/.*|.*\.dSYM/.*)$
 
 repos:
   # General file cleanups
@@ -38,7 +37,7 @@ repos:
     additional_dependencies:
     - mdformat-gfm
     - mdformat-tables
-    args: [--wrap, '80']
+    args: [--wrap, '80', --number]
 
   # YAML formatting
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks

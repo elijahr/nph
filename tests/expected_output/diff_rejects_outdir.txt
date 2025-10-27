@@ -1,0 +1,1 @@
+[Error] diff cannot be used with out or outDir

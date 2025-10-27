@@ -1,0 +1,25 @@
+
+All done! ✨ 👑 ✨
+1 file would be reformatted.
+[1m--- tests/before/fmton.nim[0m
+[1m+++ tests/before/fmton.nim (formatted)[0m
+[36m@@ -10,7 +10,7 @@[0m
+     [1, 2, 3]
+ 
+ #!fmt: on
+[31m-proc hanging(indent: int,[0m
+[31m-             isUgly = true) = discard[0m
+[32m+proc hanging(indent: int, isUgly = true) =[0m
+[32m+  discard[0m
+ 
+ block:
+[36m@@ -19,7 +19,8 @@[0m
+     discard
+   #!fmt: on
+ 
+[31m-  if         false: discard[0m
+[32m+  if false:[0m
+[32m+    discard[0m
+ 
+ #!fmt: off
+ #[ block comment ]# # trailing comment should stay

@@ -11,6 +11,7 @@ import std/[unittest, os, osproc, strutils, sequtils, macros, times]
 const
   nphBin = "./nph"
   testsDir = "tests"
+  expectedOutputDir = testsDir / "expected_output"
 
   # Discover test files at compile time - cache busts when files change!
   testFileList = staticExec(
@@ -88,22 +89,19 @@ suite "--diff mode":
     let
       beforeFile = testsDir / "before/fmton.nim"
       (output, exitCode) = execCmdEx(nphBin & " --diff " & beforeFile & " 2>&1")
+      expected = readFile(expectedOutputDir / "diff_formatting_needed.txt")
 
     check exitCode == 0
-    check "--- tests/before/fmton.nim" in output
-    check "+++ tests/before/fmton.nim (formatted)" in output
-    check "proc hanging" in output
-    check "All done! ✨ 👑 ✨" in output
-    check "1 file would be reformatted" in output
+    check output == expected
 
   test "--diff exits 0 when no formatting needed":
     let
       afterFile = testsDir / "after/fmton.nim"
       (output, exitCode) = execCmdEx(nphBin & " --diff " & afterFile & " 2>&1")
+      expected = readFile(expectedOutputDir / "diff_no_formatting_needed.txt")
 
     check exitCode == 0
-    check "---" notin output
-    check "+++" notin output
+    check output == expected
 
   test "--diff with multiple files shows all diffs":
     let
@@ -113,49 +111,49 @@ suite "--diff mode":
       (output, exitCode) = execCmdEx(
         nphBin & " --diff " & beforeFile1 & " " & beforeFile2 & " " & afterFile & " 2>&1"
       )
+      expected = readFile(expectedOutputDir / "diff_multiple_files.txt")
 
     check exitCode == 0
-    check "--- tests/before/fmton.nim" in output
-    check "--- tests/before/comments.nim" in output
-    check "2 files would be reformatted, 1 file would be left unchanged" in output
+    check output == expected
 
   test "--diff rejects --out":
     let
       beforeFile = testsDir / "before/fmton.nim"
       (output, exitCode) =
         execCmdEx(nphBin & " --diff --out:/tmp/test.nim " & beforeFile & " 2>&1")
+      expected = readFile(expectedOutputDir / "diff_rejects_out.txt")
 
     check exitCode == 3
-    check "diff cannot be used with out or outDir" in output
+    check output == expected
 
   test "--diff rejects --outDir":
     let
       beforeFile = testsDir / "before/fmton.nim"
       (output, exitCode) =
         execCmdEx(nphBin & " --diff --outDir:/tmp " & beforeFile & " 2>&1")
+      expected = readFile(expectedOutputDir / "diff_rejects_outdir.txt")
 
     check exitCode == 3
-    check "diff cannot be used with out or outDir" in output
+    check output == expected
 
 suite "--check mode":
   test "--check exits 1 when formatting needed":
     let
       beforeFile = testsDir / "before/fmton.nim"
       (output, exitCode) = execCmdEx(nphBin & " --check " & beforeFile & " 2>&1")
+      expected = readFile(expectedOutputDir / "check_formatting_needed.txt")
 
     check exitCode == 1
-    check "would reformat tests/before/fmton.nim" in output
-    check "Oh no! 💥 🚧 💥" in output
-    check "1 file would be reformatted" in output
+    check output == expected
 
   test "--check exits 0 when no formatting needed":
     let
       afterFile = testsDir / "after/fmton.nim"
       (output, exitCode) = execCmdEx(nphBin & " --check " & afterFile & " 2>&1")
+      expected = readFile(expectedOutputDir / "check_no_formatting_needed.txt")
 
     check exitCode == 0
-    check "would reformat" notin output
-    check "Oh no!" notin output
+    check output == expected
 
   test "--check with multiple files shows all files needing formatting":
     let
@@ -166,11 +164,10 @@ suite "--check mode":
         nphBin & " --check " & beforeFile1 & " " & beforeFile2 & " " & afterFile &
           " 2>&1"
       )
+      expected = readFile(expectedOutputDir / "check_multiple_files.txt")
 
     check exitCode == 1
-    check "would reformat tests/before/fmton.nim" in output
-    check "would reformat tests/before/comments.nim" in output
-    check "2 files would be reformatted, 1 file would be left unchanged" in output
+    check output == expected
 
   test "--check does not modify files":
     let
@@ -187,21 +184,19 @@ suite "--diff --check mode":
     let
       beforeFile = testsDir / "before/fmton.nim"
       (output, exitCode) = execCmdEx(nphBin & " --diff --check " & beforeFile & " 2>&1")
+      expected = readFile(expectedOutputDir / "diff_check_formatting_needed.txt")
 
     check exitCode == 1
-    check "--- tests/before/fmton.nim" in output
-    check "+++ tests/before/fmton.nim (formatted)" in output
-    check "Oh no! 💥 🚧 💥" in output
-    check "1 file would be reformatted" in output
+    check output == expected
 
   test "--diff --check exits 0 when no formatting needed":
     let
       afterFile = testsDir / "after/fmton.nim"
       (output, exitCode) = execCmdEx(nphBin & " --diff --check " & afterFile & " 2>&1")
+      expected = readFile(expectedOutputDir / "diff_check_no_formatting_needed.txt")
 
     check exitCode == 0
-    check "---" notin output
-    check "would reformat" notin output
+    check output == expected
 
 suite "write mode (default)":
   test "write mode exits 0 and writes file when formatting needed":
@@ -292,11 +287,10 @@ suite "summary messages":
       beforeFile2 = testsDir / "before/comments.nim"
       (output, exitCode) =
         execCmdEx(nphBin & " --check " & beforeFile1 & " " & beforeFile2 & " 2>&1")
+      expected = readFile(expectedOutputDir / "summary_only_reformatted.txt")
 
     check exitCode == 1
-    check "Oh no! 💥 🚧 💥" in output
-    check "2 files would be reformatted" in output
-    check "left unchanged" notin output
+    check output == expected
 
   test "summary with only unchanged files":
     let
@@ -304,10 +298,10 @@ suite "summary messages":
       afterFile2 = testsDir / "after/comments.nim"
       (output, exitCode) =
         execCmdEx(nphBin & " --check " & afterFile1 & " " & afterFile2 & " 2>&1")
+      expected = readFile(expectedOutputDir / "summary_only_unchanged.txt")
 
     check exitCode == 0
-    check "Oh no!" notin output
-    check "would be reformatted" notin output
+    check output == expected
 
   test "summary with mixed files":
     let
@@ -317,19 +311,10 @@ suite "summary messages":
       (output, exitCode) = execCmdEx(
         nphBin & " --check " & beforeFile & " " & afterFile1 & " " & afterFile2 & " 2>&1"
       )
+      expected = readFile(expectedOutputDir / "summary_mixed.txt")
 
     check exitCode == 1
-    check "Oh no! 💥 🚧 💥" in output
-    check "1 file would be reformatted" in output
-    check "2 files would be left unchanged" in output
-
-  test "--diff mode shows success emoji":
-    let
-      beforeFile = testsDir / "before/fmton.nim"
-      (output, exitCode) = execCmdEx(nphBin & " --diff " & beforeFile & " 2>&1")
-
-    check exitCode == 0
-    check "All done! ✨ 👑 ✨" in output
+    check output == expected
 
 suite "stdin handling":
   test "read from stdin and write to stdout":
@@ -349,21 +334,22 @@ suite "stdin handling":
       beforeFile = testsDir / "before/fmton.nim"
       input = readFile(beforeFile)
       (output, exitCode) =
-        execCmdEx("echo '" & input & "' | " & nphBin & " --diff - 2>&1")
+        execCmdEx("cat " & beforeFile & " | " & nphBin & " --diff - 2>&1")
+      expected = readFile(expectedOutputDir / "stdin_diff.txt")
 
     check exitCode == 0
-    check "--- -" in output
-    check "+++ - (formatted)" in output
+    check output == expected
 
   test "stdin with --check":
     let
       beforeFile = testsDir / "before/fmton.nim"
       input = readFile(beforeFile)
       (output, exitCode) =
-        execCmdEx("echo '" & input & "' | " & nphBin & " --check - 2>&1")
+        execCmdEx("cat " & beforeFile & " | " & nphBin & " --check - 2>&1")
+      expected = readFile(expectedOutputDir / "stdin_check.txt")
 
     check exitCode == 1
-    check "would reformat -" in output
+    check output == expected
 
 suite "--outDir option":
   test "--outDir writes to different directory":
@@ -468,11 +454,13 @@ suite "directory recursion":
     createDir(tmpDir)
     writeFile(tmpFile, "proc test() = discard\n")
 
-    let (output, exitCode) =
-      execCmdEx(nphBin & " " & tmpDir & " --out:/tmp/test.nim 2>&1")
+    let
+      (output, exitCode) =
+        execCmdEx(nphBin & " " & tmpDir & " --out:/tmp/test.nim 2>&1")
+      expected = readFile(expectedOutputDir / "out_rejects_directory.txt")
 
     check exitCode == 3
-    check "out cannot be used alongside directories" in output
+    check output == expected
     removeDir(tmpDir)
 
 suite "file modification time":
@@ -664,22 +652,19 @@ suite "color output":
     let
       beforeFile = testsDir / "before/fmton.nim"
       (output, exitCode) = execCmdEx(nphBin & " --color " & beforeFile & " 2>&1")
+      expected = readFile(expectedOutputDir / "color_without_diff.txt")
 
     check exitCode == 3
-    check "--color can only be used with --diff" in output
+    check output == expected
 
   test "--diff --color produces ANSI codes":
     let
       beforeFile = testsDir / "before/fmton.nim"
       (output, exitCode) = execCmdEx(nphBin & " --diff --color " & beforeFile & " 2>&1")
+      expected = readFile(expectedOutputDir / "diff_color.txt")
 
     check exitCode == 0
-    # Check for ANSI escape codes
-    check "\x1B[1m" in output # Bold (for headers)
-    check "\x1B[31m" in output # Red (for deletions)
-    check "\x1B[32m" in output # Green (for additions)
-    check "\x1B[36m" in output # Cyan (for line markers)
-    check "\x1B[0m" in output # Reset
+    check output == expected
 
   test "--diff without --color has no ANSI codes":
     let
@@ -700,11 +685,6 @@ suite "color output":
     check "\x1B[" notin output
 
   test "--diff --color shows colored headers":
-    let
-      beforeFile = testsDir / "before/fmton.nim"
-      (output, exitCode) = execCmdEx(nphBin & " --diff --color " & beforeFile & " 2>&1")
-
-    check exitCode == 0
-    # Headers should be bold
-    check "\x1B[1m--- tests/before/fmton.nim" in output
-    check "\x1B[1m+++ tests/before/fmton.nim (formatted)" in output
+    # This test is redundant with "--diff --color produces ANSI codes"
+    # which already checks the full output
+    skip()

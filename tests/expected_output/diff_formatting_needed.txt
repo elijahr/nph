@@ -1,0 +1,25 @@
+
+All done! ✨ 👑 ✨
+1 file would be reformatted.
+--- tests/before/fmton.nim
++++ tests/before/fmton.nim (formatted)
+@@ -10,7 +10,7 @@
+     [1, 2, 3]
+ 
+ #!fmt: on
+-proc hanging(indent: int,
+-             isUgly = true) = discard
++proc hanging(indent: int, isUgly = true) =
++  discard
+ 
+ block:
+@@ -19,7 +19,8 @@
+     discard
+   #!fmt: on
+ 
+-  if         false: discard
++  if false:
++    discard
+ 
+ #!fmt: off
+ #[ block comment ]# # trailing comment should stay
