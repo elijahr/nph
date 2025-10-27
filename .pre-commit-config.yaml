@@ -1,4 +1,4 @@
-exclude: ^(tests/(before|after|expected_output)/.*|.*\.dSYM/.*)$
+exclude: ^(tests/expected_output/.*|.*\.dSYM/.*)$
 
 repos:
   # General file cleanups
@@ -6,16 +6,26 @@ repos:
   rev: v5.0.0
   hooks:
   - id: trailing-whitespace
+    exclude: ^tests/(before|after)/
   - id: end-of-file-fixer
+    exclude: ^tests/(before|after)/
   - id: check-yaml
+    exclude: ^tests/(before|after)/
   - id: check-toml
+    exclude: ^tests/(before|after)/
   - id: check-added-large-files
+    exclude: ^tests/(before|after)/
   - id: check-merge-conflict
+    exclude: ^tests/(before|after)/
   - id: mixed-line-ending
     args: [--fix=lf]
+    exclude: ^tests/(before|after)/
   - id: check-case-conflict
+    exclude: ^tests/(before|after)/
   - id: check-executables-have-shebangs
+    exclude: ^tests/(before|after)/
   - id: check-shebang-scripts-are-executable
+    exclude: ^tests/(before|after)/
 
   # Shell script formatting and linting
 - repo: https://github.com/scop/pre-commit-shfmt
@@ -23,11 +33,13 @@ repos:
   hooks:
   - id: shfmt
     args: [-i, '2', -ci, -w]
+    exclude: ^tests/(before|after)/
 
 - repo: https://github.com/shellcheck-py/shellcheck-py
   rev: v0.10.0.1
   hooks:
   - id: shellcheck
+    exclude: ^tests/(before|after)/
 
   # Markdown formatting
 - repo: https://github.com/executablebooks/mdformat
@@ -38,6 +50,7 @@ repos:
     - mdformat-gfm
     - mdformat-tables
     args: [--wrap, '80', --number]
+    exclude: ^tests/(before|after)/
 
   # YAML formatting
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
@@ -45,14 +58,30 @@ repos:
   hooks:
   - id: pretty-format-yaml
     args: [--autofix, --indent, '2']
+    exclude: ^tests/(before|after)/
 
   # Use nph's own hook for formatting Nim files
 - repo: local
   hooks:
+  - id: nimble-build
+    name: nimble build
+    description: Build nph before running formatter
+    entry: nimble
+    args: [build]
+    language: system
+    files: \.nim$
+    pass_filenames: false
   - id: nph
     name: ./nph
     description: nph - opinionated Nim code formatter
     entry: ./nph
     language: system
     files: \.nim(s|ble)?$
+    exclude: ^tests/(before|after)/
+  - id: nph-debug
+    name: ./nph --debug (test fixtures)
+    description: nph - generate .nph.yaml debug files for test fixtures
+    entry: ./nph
+    language: system
+    files: ^tests/(before|after)/.*\.nim$
     args: [--debug]

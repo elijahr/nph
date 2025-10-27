@@ -16,7 +16,7 @@ const
   # Discover test files at compile time - cache busts when files change!
   testFileList = staticExec(
     "find " & currentSourcePath.parentDir() & "/before " &
-    "-name '*.nim' -type f -exec basename {} \\; | sort"
+      "-name '*.nim' -type f -exec basename {} \\; | sort"
   )
 
   testFiles = block:
@@ -44,40 +44,41 @@ macro generateFormatterTests(): untyped =
       afterPath = newLit(testsDir / "after" / testFile)
       tmpPath = newLit("/tmp/nph_test_" & testFile)
 
-    testCases.add(quote do:
-      test `testName`:
-        let
-          beforeFile = `beforePath`
-          afterFile = `afterPath`
-          tmpFile = `tmpPath`
+    testCases.add(
+      quote do:
+        test `testName`:
+          let
+            beforeFile = `beforePath`
+            afterFile = `afterPath`
+            tmpFile = `tmpPath`
 
-        check fileExists(afterFile)
-        if not fileExists(afterFile):
-          echo "Missing expected output file: " & afterFile
-          skip()
+          check fileExists(afterFile)
+          if not fileExists(afterFile):
+            echo "Missing expected output file: " & afterFile
+            skip()
 
-        let (output, exitCode) =
-          execCmdEx(nphBin & " " & beforeFile & " --out:" & tmpFile)
+          let (output, exitCode) =
+            execCmdEx(nphBin & " " & beforeFile & " --out:" & tmpFile)
 
-        check exitCode == 0
-        if exitCode != 0:
-          echo output
-          skip()
+          check exitCode == 0
+          if exitCode != 0:
+            echo output
+            skip()
 
-        let
-          formatted = readFile(tmpFile)
-          expected = readFile(afterFile)
+          let
+            formatted = readFile(tmpFile)
+            expected = readFile(afterFile)
 
-        if formatted != expected:
-          let (diffOutput, _) =
-            execCmdEx("diff -u " & afterFile & " " & tmpFile & " || true")
-          echo "\n" & diffOutput
+          if formatted != expected:
+            let (diffOutput, _) =
+              execCmdEx("diff -u " & afterFile & " " & tmpFile & " || true")
+            echo "\n" & diffOutput
 
-        check formatted == expected
-        removeFile(tmpFile)
+          check formatted == expected
+          removeFile(tmpFile)
     )
 
-  result = quote do:
+  result = quote:
     suite "formatter tests":
       `testCases`
 
