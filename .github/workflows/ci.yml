@@ -26,7 +26,7 @@ jobs:
             builder: macos-13
           - target:
               os: windows
-            builder: windows-2019
+            builder: windows-latest
     defaults:
       run:
         shell: bash
@@ -40,6 +40,16 @@ jobs:
           git config --global core.eol lf
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install OpenSSL (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install openssl -y
+          if [ -d "/c/Program Files/OpenSSL-Win64/bin" ]; then
+            echo "/c/Program Files/OpenSSL-Win64/bin" >> $GITHUB_PATH
+          elif [ -d "/c/Program Files/OpenSSL/bin" ]; then
+            echo "/c/Program Files/OpenSSL/bin" >> $GITHUB_PATH
+          fi
 
       - uses: nim-lang/setup-nimble-action@v1
         with:
