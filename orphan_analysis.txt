@@ -1,0 +1,1297 @@
+==========================================
+DETAILED ORPHAN ANALYSIS
+==========================================
+
+----------------------------------------
+FILE: .github/workflows/ci.yml
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index fbe30cc..3f3d20e 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -11,22 +11,22 @@ jobs:
+       fail-fast: false
+       matrix:
+         target:
+-          - os: linux
+-            name: linux_x64
+-          - os: macosx
+-            name: macosx_x64
+-          - os: windows
+-            name: windows_x64
++        - os: linux
++          name: linux_x64
++        - os: macosx
++          name: macosx_x64
++        - os: windows
++          name: windows_x64
+         include:
+-          - target:
+-              os: linux
+-            builder: ubuntu-22.04
+-          - target:
+-              os: macosx
+-            builder: macos-13
+-          - target:
+-              os: windows
+-            builder: windows-2019
++        - target:
++            os: linux
++          builder: ubuntu-22.04
++        - target:
++            os: macosx
++          builder: macos-13
++        - target:
++            os: windows
++          builder: windows-2019
+     defaults:
+       run:
+         shell: bash
+@@ -34,26 +34,26 @@ jobs:
+     name: CI '${{ matrix.target.name }}'
+     runs-on: ${{ matrix.builder }}
+     steps:
+-      - name: Set git to use LF
+-        run: |
+-          git config --global core.autocrlf false
+-          git config --global core.eol lf
+
+...
+
+----------------------------------------
+FILE: .github/workflows/gh-pages.yml
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/.github/workflows/gh-pages.yml b/.github/workflows/gh-pages.yml
+index 67e49e3..d377744 100644
+--- a/.github/workflows/gh-pages.yml
++++ b/.github/workflows/gh-pages.yml
+@@ -3,37 +3,37 @@ name: github pages
+ on:
+   push:
+     branches:
+-      - master
+-      - docs
++    - master
++    - docs
+ 
+ jobs:
+   deploy:
+     runs-on: ubuntu-latest
+     steps:
+-      - uses: actions/checkout@v3
+-      - uses: baptiste0928/cargo-install@v2
+-        with:
+-          crate: mdbook
+-          version: 0.4.36
+-      - uses: baptiste0928/cargo-install@v2
+-        with:
+-          crate: mdbook-toc
+-          version: 0.14.1
+-      - uses: baptiste0928/cargo-install@v2
+-        with:
+-          crate: mdbook-open-on-gh
+-          version: 2.4.1
+-      - uses: baptiste0928/cargo-install@v2
+-        with:
+-          crate: mdbook-admonish
+-          version: 1.14.0
+-      - name: Build book
+-        run: |
+-          PATH=.cargo/bin:$PATH mdbook build docs
++    - uses: actions/checkout@v3
++    - uses: baptiste0928/cargo-install@v2
++      with:
++        crate: mdbook
++        version: 0.4.36
++    - uses: baptiste0928/cargo-install@v2
++      with:
++        crate: mdbook-toc
++        version: 0.14.1
++    - uses: baptiste0928/cargo-install@v2
++      with:
++        crate: mdbook-open-on-gh
++        version: 2.4.1
+
+...
+
+----------------------------------------
+FILE: .github/workflows/release.yml
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/.github/workflows/release.yml b/.github/workflows/release.yml
+index 3b4b74c..65db5dc 100644
+--- a/.github/workflows/release.yml
++++ b/.github/workflows/release.yml
+@@ -2,10 +2,10 @@ name: Binaries
+ on:
+   push:
+     branches:
+-      - master
+-      - release
++    - master
++    - release
+     tags:
+-      - "v*"
++    - v*
+   workflow_dispatch:
+ 
+ 
+@@ -15,35 +15,35 @@ jobs:
+       fail-fast: false
+       matrix:
+         target:
+-          - os: linux
+-            name: linux_x64
+-          - os: linux
+-            name: linux_x32
+-          - os: linux
+-            name: linux_arm64
+-          - os: linux
+-            name: linux_armv7l
+-          - os: macosx
++        - os: linux
++          name: linux_x64
++        - os: linux
++          name: linux_x32
++        - os: linux
++          name: linux_arm64
++        - os: linux
++          name: linux_armv7l
++        - os: macosx
++          name: macosx_x64
++        - os: macosx
++          name: macosx_arm64
++        - os: windows
++          name: windows_x64
++        include:
++        - target:
++            os: linux
++          builder: ubuntu-22.04
++        - target:
+
+...
+
+----------------------------------------
+FILE: .gitignore
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/.gitignore b/.gitignore
+index 6921a08..3d613e1 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -4,3 +4,10 @@ nimble.develop
+ nimble.paths
+ *.exe
+ playground/
++*.dSYM/
++/tests/test_formatter
++
++# Ignore .nph.yaml debug files except in test fixtures
++*.nph.yaml
++!/tests/before/*.nph.yaml
++!/tests/after/*.nph.yaml
+
+...
+
+----------------------------------------
+FILE: CHANGELOG.md
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 980df5a..accf3dc 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -1,52 +1,71 @@
+ # Changelog
+ 
++# Unreleased
++
++New features:
++
++- `--diff` flag to show unified diff of formatting changes without modifying
++  files
++- `--color` / `--no-color` flags for colored diff output (requires `--diff`)
++- `.nph.toml` config file support for project-level configuration
++- `--exclude` flag to replace default exclusion patterns
++- `--extend-exclude` flag to add patterns to default exclusions
++- `--include` flag to customize which files to format
++- `--config` flag to specify a custom config file
++- Default exclusion patterns for common directories (build, dist, .git,
++  nimcache, etc.)
++- Files passed explicitly on CLI bypass all exclude filters (matching Black's
++  behavior)
++- CLI options override config file settings
++- pre-commit integration support with `nph` hook
++
+ # 0.6.1
+ 
+ No formatting changes!
+ 
+-* nimble compatibility updates (fixes `nimble install nph` sometimes)
+-* osx arm64 binaries
++- nimble compatibility updates (fixes `nimble install nph` sometimes)
++- osx arm64 binaries
+ 
+ # 0.6.0
+ 
+-* avoid putting `,` on its own line after complex expressions, where possible
+-* allow compiling with a wider range of Nim 2.0 versions, hoping it won't break
+-* a few bugfixes
++- avoid putting `,` on its own line after complex expressions, where possible
++- allow compiling with a wider range of Nim 2.0 versions, hoping it won't break
++- a few bugfixes
+ 
+ # 0.5.1
+ 
+-* fix a bug in the length computation of postfix-commented items
+-* fix a bug in statement list expression rendering in calls
+-* fix a bug in whitespace retention between calls
++- fix a bug in the length computation of postfix-commented items
+
+...
+
+----------------------------------------
+FILE: CONTRIBUTING.md
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/CONTRIBUTING.md b/CONTRIBUTING.md
+new file mode 100644
+index 0000000..aff903f
+--- /dev/null
++++ b/CONTRIBUTING.md
+@@ -0,0 +1,106 @@
++# Contributing to nph
++
++Thank you for your interest in contributing to nph!
++
++## Development Setup
++
++```sh
++# Clone the repository
++git clone https://github.com/arnetheduck/nph.git
++cd nph
++
++# Install dependencies (requires Nim 2.2.x)
++nimble setup -l
++nimble build
++
++# Install pre-commit hooks (optional but recommended)
++pre-commit install
++```
++
++## Running Tests
++
++```sh
++# Run all tests
++nimble test
++
++# Run specific test file
++nim c -r tests/test_formatter.nim
++```
++
++### Adding New Formatter Tests
++
++Tests are automatically discovered from the `tests/before/` directory. To add a
++new test:
++
++1. **Create the input file**: `tests/before/my_test.nim`
++
++   - This is the unformatted Nim code you want to test
++
++2. **Create the expected output**: `tests/after/my_test.nim`
++
++   - This is what nph should produce after formatting
++
++3. **Run tests**: The test will be automatically picked up and run
++
+
+...
+
+----------------------------------------
+FILE: README.md
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/README.md b/README.md
+index 6929de9..80d927f 100644
+--- a/README.md
++++ b/README.md
+@@ -4,9 +4,10 @@
+ take the drudgery of manual formatting out of your coding day.
+ 
+ Following the great tradition of [`black`](https://github.com/psf/black/),
+-[`prettier`](https://prettier.io/), [`clang-format`](https://clang.llvm.org/docs/ClangFormat.html)
+-and other AST-based formatters, it discards existing styling to create a
+-consistent and beautiful codebase.
++[`prettier`](https://prettier.io/),
++[`clang-format`](https://clang.llvm.org/docs/ClangFormat.html) and other
++AST-based formatters, it discards existing styling to create a consistent and
++beautiful codebase.
+ 
+ ## Documentation
+ 
+@@ -29,15 +30,51 @@ nph src/
+ # Use --check to verify that a file is formatted as `nph` would - useful in CI
+ nph --check somefile.nim || echo "Not formatted!"
+ 
++# Show a diff of what would change without modifying files
++nph --diff somefile.nim
++
++# Show a colored diff (requires --diff)
++nph --diff --color somefile.nim
++
+ # You can format stuff as part of a pipe using `-` as input:
+ echo "echo 1" | nph -
+ ```
+ 
+-More information about features and style available from the [documentation](https://arnetheduck.github.io/nph/)
++## Configuration
++
++You can configure `nph` using a `.nph.toml` file in your project root:
++
++```toml
++# Completely replace default exclusions
++exclude = [
++  "build",
++  "dist",
++]
++
++# Add to default exclusions (more common)
++extend-exclude = [
++  "tests/fixtures",
++  "vendor",
++]
++
+
+...
+
+----------------------------------------
+FILE: config.nims
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/config.nims b/config.nims
+index 3ce3989..0e4c4aa 100644
+--- a/config.nims
++++ b/config.nims
+@@ -1,6 +1,6 @@
+ # begin Nimble config (version 2)
+ when withDir(thisDir(), system.fileExists("nimble.paths")):
+   include "nimble.paths"
+-# end Nimble config
+-
+-  --stylecheck:error
++  # end Nimble config
++  --stylecheck:
++    error
+
+...
+
+----------------------------------------
+FILE: docs/open-in.css
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/docs/open-in.css b/docs/open-in.css
+index aeb951f..7c46d76 100644
+--- a/docs/open-in.css
++++ b/docs/open-in.css
+@@ -4,4 +4,3 @@ footer {
+   border-top: 1px solid black;
+   padding: 5px 0;
+ }
+-
+
+...
+
+----------------------------------------
+FILE: docs/src/book.md
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/docs/src/book.md b/docs/src/book.md
+index bc1255e..6a07278 100644
+--- a/docs/src/book.md
++++ b/docs/src/book.md
+@@ -1,6 +1,7 @@
+ # Updating this book
+ 
+-The book is built using [mdBook](https://github.com/rust-lang/mdBook), and published to gh-pages using a github action.
++The book is built using [mdBook](https://github.com/rust-lang/mdBook), and
++published to gh-pages using a github action.
+ 
+ ```bash
+ # Install or update tooling (make sure you add "~/.cargo/bin" to PATH):
+
+...
+
+----------------------------------------
+FILE: docs/src/faq.md
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/docs/src/faq.md b/docs/src/faq.md
+index 79c4f73..c6d20dd 100644
+--- a/docs/src/faq.md
++++ b/docs/src/faq.md
+@@ -44,6 +44,7 @@ echo $(git rev-parse HEAD) >> .git-blame-ignore-revs
+ ```
+ 
+ then configure git to use it:
++
+ ```sh
+ git config --global blame.ignoreRevsFile .git-blame-ignore-revs
+ ```
+@@ -55,19 +56,19 @@ introduces formatting changes.
+ 
+ One of several things could have happened:
+ 
+-* The code was not valid enough - `nph` can only parse valid Nim grammar and
++- The code was not valid enough - `nph` can only parse valid Nim grammar and
+   while it would be nice to handle partially formatted stuff gracefully, we're
+   not there yet.
+-* The parser has a bug and is unable to parse valid Nim code
+-  * Probably you can move some comments around to make it work!
+-* the formatter has a bug and the resulting formatting is invalid
+-  * Probably you can move some comments around to make it work!
+-* the AST equivalence checker complains
+-  * This often happens in complex expressions such as `do`  and parenthesis used
++- The parser has a bug and is unable to parse valid Nim code
++  - Probably you can move some comments around to make it work!
++- the formatter has a bug and the resulting formatting is invalid
++  - Probably you can move some comments around to make it work!
++- the AST equivalence checker complains
++  - This often happens in complex expressions such as `do` and parenthesis used
+     for indent purposes where the Nim grammar has ambiguities and parsing
+     complexity - it can usually be worked around by simplifying complex
+     expressions, introducing a template or similar
+-  * It could also be that the AST checker is too strict - the Nim parser will
++  - It could also be that the AST checker is too strict - the Nim parser will
+     generate different AST:s depending on whitespace even if semantically there
+     is no difference
+ 
+@@ -78,32 +79,33 @@ If you have time, try to find the offending code snippet and submit an issue.
+ 
+ ## Why the cited formatters in particular?
+ 
+-* `black` because of our syntactic similarity with Python and its
++- `black` because of our syntactic similarity with Python and its
+   [stability policy](https://black.readthedocs.io/en/stable/the_black_code_style/index.html#stability-policy)
+-* `prettier` for its wisdom in how formatting [options](https://prettier.io/docs/en/option-philosophy)
+-  are approached and for the closeness to user experience of its developers
+-* `clang-format` for being the formatter that made me stop worrying about
+
+...
+
+----------------------------------------
+FILE: docs/src/installation.md
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/docs/src/installation.md b/docs/src/installation.md
+index 3d1dc44..faac012 100644
+--- a/docs/src/installation.md
++++ b/docs/src/installation.md
+@@ -2,7 +2,8 @@
+ 
+ ## Binaries
+ 
+-Download binaries from the [releases page](https://github.com/arnetheduck/nph/releases/tag/latest).
++Download binaries from the
++[releases page](https://github.com/arnetheduck/nph/releases/tag/latest).
+ 
+ ## Install via nimble
+ 
+@@ -25,14 +26,21 @@ reuses parts of the compiler whose API frequently changes - this may lead to
+ `nim` itself being built as part of the installation process!
+ ```
+ 
+-For bonus points, replace `nimpretty` with a symlink to `nph` - similar
+-command line options are supported ;)
++For bonus points, replace `nimpretty` with a symlink to `nph` - similar command
++line options are supported ;)
+ 
+ ## Editor integration
+ 
+-* [VSCode](https://marketplace.visualstudio.com/items?itemName=NimLang.nimlang) (`ext install NimLang.nimlang`) extension via [nimlangserver](https://github.com/nim-lang/langserver/) that supports `nph` out of the box
+-* [NeoVim](https://github.com/sbdchd/neoformat) - Install **neoformat** in your neovim setup then add the nim formating option with **nph** with this option in init.vim `let g:neoformat_enabled_nim = ['nph']`
+-* [Zed Editor](https://github.com/foxoman/zed-nim) - Use this in your editor settings
++- [VSCode](https://marketplace.visualstudio.com/items?itemName=NimLang.nimlang)
++  (`ext install NimLang.nimlang`) extension via
++  [nimlangserver](https://github.com/nim-lang/langserver/) that supports `nph`
++  out of the box
++- [NeoVim](https://github.com/sbdchd/neoformat) - Install **neoformat** in your
++  neovim setup then add the nim formating option with **nph** with this option
++  in init.vim `let g:neoformat_enabled_nim = ['nph']`
++- [Zed Editor](https://github.com/foxoman/zed-nim) - Use this in your editor
++  settings
++
+ ```
+ "languages": {
+     "Nim": {
+@@ -45,9 +53,13 @@ command line options are supported ;)
+     }
+   }
+ ```
+-* [vscode-nph](https://marketplace.visualstudio.com/items?itemName=arnetheduck.vscode-nph) (`ext install arnetheduck.vscode-nph`) for a formatting-only option for the official Nim extension.
+ 
+-## Continuous integration
++- [vscode-nph](https://marketplace.visualstudio.com/items?itemName=arnetheduck.vscode-nph)
++  (`ext install arnetheduck.vscode-nph`) for a formatting-only option for the
+
+...
+
+----------------------------------------
+FILE: docs/src/introduction.md
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/docs/src/introduction.md b/docs/src/introduction.md
+index db1206c..a5f5ef5 100644
+--- a/docs/src/introduction.md
++++ b/docs/src/introduction.md
+@@ -4,29 +4,31 @@
+ take the drudgery of manual formatting out of your coding day.
+ 
+ Following the great tradition of [`black`](https://github.com/psf/black/),
+-[`prettier`](https://prettier.io/), [`clang-format`](https://clang.llvm.org/docs/ClangFormat.html)
+-and other AST-based formatters, it discards existing styling to create a
+-consistent and beautiful codebase.
++[`prettier`](https://prettier.io/),
++[`clang-format`](https://clang.llvm.org/docs/ClangFormat.html) and other
++AST-based formatters, it discards existing styling to create a consistent and
++beautiful codebase.
+ 
+ ## Priorities
+ 
+ `nph` aims to format code in such way that:
+ 
+-* it remains semantically unchanged, aka correct (!)
+-  * the AST is checked for equivalence before writing the formatted code to
+-    disk - on mismatch, the code is left untouched
+-* it remains simple, consistent and pleasant to read
+-  * _most_ code should look as good as or better than its hand-formatted
++- it remains semantically unchanged, aka correct (!)
++  - the AST is checked for equivalence before writing the formatted code to disk
++    \- on mismatch, the code is left untouched
++- it remains simple, consistent and pleasant to read
++  - _most_ code should look as good as or better than its hand-formatted
+     counterpart
+-* diffs are kept at a minimum
+-  * diff-inducing constructs such as vertical alignment are avoided, for more
++- diffs are kept at a minimum
++  - diff-inducing constructs such as vertical alignment are avoided, for more
+     productive merges
+-  * formatting the same code again results in no differences
+-* it broadly follows the [Status Nim style guide](https://status-im.github.io/nim-style-guide/)
+-  and [NEP1](https://nim-lang.org/docs/nep1.html)
+-  * this is tool aimed at making collaboration easier, with others and your
++  - formatting the same code again results in no differences
++- it broadly follows the
++  [Status Nim style guide](https://status-im.github.io/nim-style-guide/) and
++  [NEP1](https://nim-lang.org/docs/nep1.html)
++  - this is tool aimed at making collaboration easier, with others and your
+     future self
+-  * where NEP1 contradicts itself or these priorities, these priorities have
++  - where NEP1 contradicts itself or these priorities, these priorities have
+     precedence
+ 
+
+...
+
+----------------------------------------
+FILE: docs/src/style.md
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/docs/src/style.md b/docs/src/style.md
+index 2226c3a..47673b1 100644
+--- a/docs/src/style.md
++++ b/docs/src/style.md
+@@ -90,7 +90,8 @@ If the list still doesn't fit on a single line, we look at the contents to
+ choose between two styles.
+ 
+ If it contains complex complex values, we render one value per row - this
+-happens most often for function parameters and other information-dense constructs.
++happens most often for function parameters and other information-dense
++constructs.
+ 
+ ```nim
+ import
+
+...
+
+----------------------------------------
+FILE: docs/src/usage.md
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/docs/src/usage.md b/docs/src/usage.md
+index 756c675..82d81d8 100644
+--- a/docs/src/usage.md
++++ b/docs/src/usage.md
+@@ -13,13 +13,178 @@ nph src/
+ # Use --check to verify that a file is formatted correctly as `nph` would - useful in CI
+ nph --check somefile.nim || echo "Not formatted!"
+ 
++# Show a diff of what would change without modifying files
++nph --diff somefile.nim
++
++# Show a colored diff (requires --diff)
++nph --diff --color somefile.nim
++
+ # You can format stuff as part of a pipe using `-` as input:
+ echo "echo 1" | nph -
+ ```
+ 
++## Configuration file
++
++You can configure `nph` using a `.nph.toml` file in your project root. CLI
++options override config file settings.
++
++```toml
++# Completely replace default exclusions with your own patterns
++exclude = [
++  "build",
++  "dist",
++]
++
++# Add to default exclusions (recommended - doesn't lose the defaults)
++extend-exclude = [
++  "tests/fixtures",
++  "vendor",
++]
++
++# Customize which files to include (default: \.nim(s|ble)?$)
++include = [
++  "\.nim$",
++  "\.nims$",
++]
++```
++
++### Default exclusions
++
++By default, `nph` excludes common directories that typically don't contain
++source code:
++
++- `.git`, `.hg`, `.svn` - version control
++- `.nimble`, `nimcache` - Nim build artifacts
+
+...
+
+----------------------------------------
+FILE: format-git-repo.sh
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/format-git-repo.sh b/format-git-repo.sh
+index 0030a3b..9dcaf4e 100755
+--- a/format-git-repo.sh
++++ b/format-git-repo.sh
+@@ -3,16 +3,22 @@
+ 
+ set -eo pipefail
+ 
+-git diff --exit-code > /dev/null || { echo "Commit changes before doing a (potentially) large reformat!" ; exit 1 ; }
++git diff --exit-code >/dev/null || {
++  echo "Commit changes before doing a (potentially) large reformat!"
++  exit 1
++}
+ 
+ git ls-files | grep ".nim$" | xargs -n1 nph
+ 
+-! git diff --exit-code > /dev/null || { echo "This repository is already formatted" ; exit 0 ; }
++! git diff --exit-code >/dev/null || {
++  echo "This repository is already formatted"
++  exit 0
++}
+ 
+ git commit -am "Formatted with nph $(nph --version)" --author "nph <nph@example.com>"
+ 
+-echo "# Formatted with nph $(nph --version)" >> .git-blame-ignore-revs
+-echo "$(git rev-parse HEAD)" >> .git-blame-ignore-revs
++echo "# Formatted with nph $(nph --version)" >>.git-blame-ignore-revs
++git rev-parse HEAD >>.git-blame-ignore-revs
+ 
+ git add .git-blame-ignore-revs
+ git commit -m "Add $(git rev-parse HEAD) to .git-blame-ignore-revs" --author "nph <nph@example.com>"
+
+...
+
+----------------------------------------
+FILE: nph.nimble
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/nph.nimble b/nph.nimble
+index 26c5a24..954e00b 100644
+--- a/nph.nimble
++++ b/nph.nimble
+@@ -1,11 +1,11 @@
+ # Package
+ 
+-version       = "0.6.1"
+-author        = "Jacek Sieka"
+-description   = "Nim code formatter"
+-license       = "MIT"
+-srcDir        = "src"
+-bin           = @["nph"]
++version = "0.6.1"
++author = "Jacek Sieka"
++description = "Nim code formatter"
++license = "MIT"
++srcDir = "src"
++bin = @["nph"]
+ 
+ # Dependencies
+ 
+@@ -15,7 +15,9 @@ bin           = @["nph"]
+ # Note that the parser used by the formatter and the parser used by the verifier
+ # might disagree if syntax changes are included in a Nim patch version.
+ # TODO: nph should learn how to check formatting with any nim version
+-requires "nim >= 2.2.0 & < 2.3", "compiler >= 2.2.0 & < 2.3"
++requires "nim >= 2.2.0 & < 2.3",
++  "compiler >= 2.2.0 & < 2.3", "hldiff >= 1.0.5 & < 2.0.0", "glob >= 0.11.3 & < 0.12.0",
++  "parsetoml >= 0.7.2 & < 0.8.0"
+ 
+ proc build() =
+   exec "nim c --debuginfo -o:nph src/nph"
+@@ -27,7 +29,7 @@ task self, "Format nph itself":
+   exec "git diff --no-ext-diff --quiet --exit-code"
+ 
+   for file in listFiles("src"):
+-    if file.len > 4 and file[^4..^1] == ".nim":
++    if file.len > 4 and file[^4 ..^ 1] == ".nim":
+       echo file
+       exec "./nph " & file
+ 
+@@ -39,14 +41,11 @@ task f, "Format":
+   # Sort tests so that 00_empty always is first, which makes it a convenient
+   # experimentation ground :)
+   for file in sorted(listFiles(".")):
+-    if file.len > 4 and file[^4..^1] == ".nim":
++    if file.len > 4 and file[^4 ..^ 1] == ".nim":
+       echo file
+       exec "../../nph " & file & " --outDir:../after --debug"
+
+...
+
+----------------------------------------
+FILE: src/nph.nim
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/src/nph.nim b/src/nph.nim
+index e0e3ffe..5768e05 100644
+--- a/src/nph.nim
++++ b/src/nph.nim
+@@ -10,11 +10,29 @@ import
+ 
+ import "$nim"/compiler/idents
+ 
+-import std/[parseopt, strutils, os, sequtils]
++import std/[parseopt, strutils, os, sequtils, tables, terminal]
++import std/re as stdre
++import pkg/hldiffpkg/edits
++import pkg/adix/lptabz
++import pkg/parsetoml
++
++# Silence LPTabz warnings by redirecting to /dev/null
++when defined(posix):
++  lpWarn = open("/dev/null", fmWrite)
++elif defined(windows):
++  lpWarn = open("NUL", fmWrite)
++else:
++  # Fallback: just use stderr but set max warnings to 0
++  lpMaxWarn = 0
+ 
+ static:
+   doAssert NimMajor == 2 and NimMinor == 2, "nph needs a specific version of Nim"
+ 
++type NphConfig = object
++  exclude: seq[string]
++  extendExclude: seq[string]
++  includePatterns: seq[string]
++
+ const
+   Version = gorge("git describe --long --dirty --always --tags")
+   Usage =
+@@ -24,15 +42,29 @@ Usage:
+   nph [options] nimfiles...
+ Options:
+   --check               check the formatting instead of performing it
++  --diff                show diff of formatting changes without writing files
+   --out:file            set the output file (default: overwrite the input file)
+   --outDir:dir          set the output dir (default: overwrite the input files)
++  --exclude:pattern     regex pattern for files/dirs to exclude (overrides defaults)
++  --extend-exclude:pattern  regex pattern to add to default exclusions
++  --include:pattern     regex pattern for files to include (default: \.nim(s|ble)?$)
++  --color               show colored diff (only applies when --diff is given)
++  --no-color            disable colored diff (default)
++  --config:file         config file to use (default: .nph.toml if it exists)
+   --version             show the version
+   --help                show this help
+
+...
+
+----------------------------------------
+FILE: tests/after/comments.nim
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/tests/after/comments.nim b/tests/after/comments.nim
+index 2c65e42..5d89fad 100644
+--- a/tests/after/comments.nim
++++ b/tests/after/comments.nim
+@@ -29,6 +29,25 @@ and this
+   ]#
+ ]#
+ 
++# Test block comment followed by single-line comment on same line
++#[ block comment ]#
++# trailing comment
++##[ doc block comment ]##
++# trailing doc comment
++
++# Test with actual multiline block comments
++#[
++  multiline
++  block comment
++]#
++# trailing comment should stay on same line
++
++##[
++  multiline doc
++  block comment
++]##
++# trailing doc comment on same line
++
+ template x() =
+   ## A template doc comment
+   try:
+
+...
+
+----------------------------------------
+FILE: tests/after/comments.nim.nph.yaml
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/tests/after/comments.nim.nph.yaml b/tests/after/comments.nim.nph.yaml
+index bd58056..b11ffdb 100644
+--- a/tests/after/comments.nim.nph.yaml
++++ b/tests/after/comments.nim.nph.yaml
+@@ -28,6 +28,26 @@ sons:
+     "comment": "##[\u000A  these also come in doc variants\u000A]##"
+   - kind: "nkCommentStmt"
+     "comment": "#[\u000A  #[\u000A    they can be nested\u000A  ]#\u000A]#"
++  - kind: "nkCommentStmt"
++    "comment": "# Test block comment followed by single-line comment on same line"
++  - kind: "nkCommentStmt"
++    "comment": "#[ block comment ]#"
++  - kind: "nkCommentStmt"
++    "comment": "# trailing comment"
++  - kind: "nkCommentStmt"
++    "comment": "##[ doc block comment ]##"
++  - kind: "nkCommentStmt"
++    "comment": "# trailing doc comment"
++  - kind: "nkCommentStmt"
++    "comment": "# Test with actual multiline block comments"
++  - kind: "nkCommentStmt"
++    "comment": "#[\u000A  multiline\u000A  block comment\u000A]#"
++  - kind: "nkCommentStmt"
++    "comment": "# trailing comment should stay on same line"
++  - kind: "nkCommentStmt"
++    "comment": "##[\u000A  multiline doc\u000A  block comment\u000A]##"
++  - kind: "nkCommentStmt"
++    "comment": "# trailing doc comment on same line"
+   - kind: "nkTemplateDef"
+     sons:
+       - kind: "nkIdent"
+
+...
+
+----------------------------------------
+FILE: tests/after/fmton.nim
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/tests/after/fmton.nim b/tests/after/fmton.nim
+index 841d465..e85cf9d 100644
+--- a/tests/after/fmton.nim
++++ b/tests/after/fmton.nim
+@@ -21,3 +21,12 @@ block:
+ 
+   if false:
+     discard
++
++#!fmt: off
++#[ block comment ]# # trailing comment should stay
++var   ugly   =   1
++#[
++  multiline
++  block
++]# # also should stay on same line
++#!fmt: on
+
+...
+
+----------------------------------------
+FILE: tests/after/fmton.nim.nph.yaml
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/tests/after/fmton.nim.nph.yaml b/tests/after/fmton.nim.nph.yaml
+index f3be6da..fbee7a6 100644
+--- a/tests/after/fmton.nim.nph.yaml
++++ b/tests/after/fmton.nim.nph.yaml
+@@ -75,3 +75,5 @@ sons:
+                       - kind: "nkDiscardStmt"
+                         sons:
+                           - kind: "nkEmpty"
++  - kind: "nkCommentStmt"
++    "comment": "#!fmt: off\u000A#[ block comment ]# # trailing comment should stay\u000Avar   ugly   =   1\u000A#[\u000A  multiline\u000A  block\u000A]# # also should stay on same line\u000A#!fmt: on"
+
+...
+
+----------------------------------------
+FILE: tests/before/comments.nim
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/tests/before/comments.nim b/tests/before/comments.nim
+index af6d18c..86ef721 100644
+--- a/tests/before/comments.nim
++++ b/tests/before/comments.nim
+@@ -30,6 +30,25 @@ and this
+   ]#
+ ]#
+ 
++# Test block comment followed by single-line comment on same line
++#[ block comment ]#
++# trailing comment
++##[ doc block comment ]##
++# trailing doc comment
++
++# Test with actual multiline block comments
++#[
++  multiline
++  block comment
++]#
++# trailing comment should stay on same line
++
++##[
++  multiline doc
++  block comment
++]##
++# trailing doc comment on same line
++
+ template x =
+   ## A template doc comment
+   try:
+
+...
+
+----------------------------------------
+FILE: tests/before/comments.nim.nph.yaml
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/tests/before/comments.nim.nph.yaml b/tests/before/comments.nim.nph.yaml
+index 9446a7f..2dd3282 100644
+--- a/tests/before/comments.nim.nph.yaml
++++ b/tests/before/comments.nim.nph.yaml
+@@ -28,6 +28,26 @@ sons:
+     "comment": "##[\u000A  these also come in doc variants\u000A]##"
+   - kind: "nkCommentStmt"
+     "comment": "#[\u000A  #[\u000A    they can be nested\u000A  ]#\u000A]#"
++  - kind: "nkCommentStmt"
++    "comment": "# Test block comment followed by single-line comment on same line"
++  - kind: "nkCommentStmt"
++    "comment": "#[ block comment ]#"
++  - kind: "nkCommentStmt"
++    "comment": "# trailing comment"
++  - kind: "nkCommentStmt"
++    "comment": "##[ doc block comment ]##"
++  - kind: "nkCommentStmt"
++    "comment": "# trailing doc comment"
++  - kind: "nkCommentStmt"
++    "comment": "# Test with actual multiline block comments"
++  - kind: "nkCommentStmt"
++    "comment": "#[\u000A  multiline\u000A  block comment\u000A]#"
++  - kind: "nkCommentStmt"
++    "comment": "# trailing comment should stay on same line"
++  - kind: "nkCommentStmt"
++    "comment": "##[\u000A  multiline doc\u000A  block comment\u000A]##"
++  - kind: "nkCommentStmt"
++    "comment": "# trailing doc comment on same line"
+   - kind: "nkTemplateDef"
+     sons:
+       - kind: "nkIdent"
+
+...
+
+----------------------------------------
+FILE: tests/before/fmton.nim
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/tests/before/fmton.nim b/tests/before/fmton.nim
+index 99bcefe..4964a37 100644
+--- a/tests/before/fmton.nim
++++ b/tests/before/fmton.nim
+@@ -1,4 +1,5 @@
+-proc      getsFormatted(a, b : int    ) = discard
++proc getsFormatted(a, b: int) =
++  discard
+ 
+ #!fmt: off
+ let
+@@ -12,12 +13,19 @@ let
+ proc hanging(indent: int,
+              isUgly = true) = discard
+ 
+-
+ block:
+   #!fmt: off
+   if   true   :
+     discard
+   #!fmt: on
+ 
+-  if   false   :
+-    discard
+\ No newline at end of file
++  if         false: discard
++
++#!fmt: off
++#[ block comment ]# # trailing comment should stay
++var   ugly   =   1
++#[
++  multiline
++  block
++]# # also should stay on same line
++#!fmt: on
+
+...
+
+----------------------------------------
+FILE: tests/before/fmton.nim.nph.yaml
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/tests/before/fmton.nim.nph.yaml b/tests/before/fmton.nim.nph.yaml
+index f3be6da..fbee7a6 100644
+--- a/tests/before/fmton.nim.nph.yaml
++++ b/tests/before/fmton.nim.nph.yaml
+@@ -75,3 +75,5 @@ sons:
+                       - kind: "nkDiscardStmt"
+                         sons:
+                           - kind: "nkEmpty"
++  - kind: "nkCommentStmt"
++    "comment": "#!fmt: off\u000A#[ block comment ]# # trailing comment should stay\u000Avar   ugly   =   1\u000A#[\u000A  multiline\u000A  block\u000A]# # also should stay on same line\u000A#!fmt: on"
+
+...
+
+----------------------------------------
+FILE: tests/test_formatter.nim
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/tests/test_formatter.nim b/tests/test_formatter.nim
+new file mode 100644
+index 0000000..7f8ef41
+--- /dev/null
++++ b/tests/test_formatter.nim
+@@ -0,0 +1,691 @@
++## nph test suite with compile-time test generation
++##
++## The "formatter tests" suite is generated at compile time based on files
++## in tests/before/*.nim. When you add/remove test files, the const changes
++## and Nim automatically recompiles.
++##
++## All other test suites are defined normally below.
++
++import std/[unittest, os, osproc, strutils, sequtils, macros, times]
++
++const
++  nphBin = "./nph"
++  testsDir = "tests"
++  expectedOutputDir = testsDir / "expected_output"
++
++  # Discover test files at compile time - cache busts when files change!
++  testFileList = staticExec(
++    "find " & currentSourcePath.parentDir() & "/before " &
++      "-name '*.nim' -type f -exec basename {} \\; | sort"
++  )
++
++  testFiles = block:
++    let files = testFileList.strip().splitLines()
++    files.filterIt(it.len > 0)
++
++# Show discovered tests at compile time
++static:
++  echo "\n=== Compile-time test discovery ==="
++  echo "Found ", testFiles.len, " formatter test files:"
++  for f in testFiles:
++    echo "  ✓ ", f
++  echo "===================================\n"
++
++macro generateFormatterTests(): untyped =
++  ## Generate a test case for each file in tests/before/*.nim
++  result = newStmtList()
++
++  var testCases = newStmtList()
++
++  for testFile in testFiles:
++    let
++      testName = newLit(testFile)
++      beforePath = newLit(testsDir / "before" / testFile)
++      afterPath = newLit(testsDir / "after" / testFile)
+
+...
+
+----------------------------------------
+FILE: vscode-nph/.eslintrc.json
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/vscode-nph/.eslintrc.json b/vscode-nph/.eslintrc.json
+index 86c86f3..c70bf00 100644
+--- a/vscode-nph/.eslintrc.json
++++ b/vscode-nph/.eslintrc.json
+@@ -27,4 +27,4 @@
+         "dist",
+         "**/*.d.ts"
+     ]
+-}
+\ No newline at end of file
++}
+
+...
+
+----------------------------------------
+FILE: vscode-nph/.vscode/settings.json
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/vscode-nph/.vscode/settings.json b/vscode-nph/.vscode/settings.json
+index 30bf8c2..fa0a104 100644
+--- a/vscode-nph/.vscode/settings.json
++++ b/vscode-nph/.vscode/settings.json
+@@ -8,4 +8,4 @@
+     },
+     // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
+     "typescript.tsc.autoDetect": "off"
+-}
+\ No newline at end of file
++}
+
+...
+
+----------------------------------------
+FILE: vscode-nph/.yarnrc
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/vscode-nph/.yarnrc b/vscode-nph/.yarnrc
+index f757a6a..4f14322 100644
+--- a/vscode-nph/.yarnrc
++++ b/vscode-nph/.yarnrc
+@@ -1 +1 @@
+---ignore-engines true
+\ No newline at end of file
++--ignore-engines true
+
+...
+
+----------------------------------------
+FILE: vscode-nph/README.md
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/vscode-nph/README.md b/vscode-nph/README.md
+index 99dee00..73bc270 100644
+--- a/vscode-nph/README.md
++++ b/vscode-nph/README.md
+@@ -1,17 +1,22 @@
+ # VSCode nph integration
+ 
+-Format [Nim](https://nim-lang.org) code using [`nph`](https://github.com/arnetheduck/nph).
++Format [Nim](https://nim-lang.org) code using
++[`nph`](https://github.com/arnetheduck/nph).
+ 
+-Full-featured `Nim` support including formatting via `nph` is available from the [official Nim extension](https://marketplace.visualstudio.com/items?itemName=NimLang.nimlang) - if you're using it, `vscode-nph` is no longer needed.
++Full-featured `Nim` support including formatting via `nph` is available from the
++[official Nim extension](https://marketplace.visualstudio.com/items?itemName=NimLang.nimlang)
++\- if you're using it, `vscode-nph` is no longer needed.
+ 
+ ## Features
+ 
+-Enables formatting of Nim code via `Format document` from the command palette as well as format-on-save if enabled in settings.
++Enables formatting of Nim code via `Format document` from the command palette as
++well as format-on-save if enabled in settings.
+ 
+ ## Requirements
+ 
+ You need to have `nph` installed and available in your `$PATH`.
+ 
+-Binaries are available for download from the [release page](https://github.com/arnetheduck/nph/releases).
++Binaries are available for download from the
++[release page](https://github.com/arnetheduck/nph/releases).
+ 
+ **Enjoy!**
+
+...
+
+----------------------------------------
+FILE: vscode-nph/src/extension.ts
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/vscode-nph/src/extension.ts b/vscode-nph/src/extension.ts
+index 4bc845b..5036cf6 100644
+--- a/vscode-nph/src/extension.ts
++++ b/vscode-nph/src/extension.ts
+@@ -46,4 +46,4 @@ export function activate(context: vscode.ExtensionContext) {
+ }
+ 
+ // this method is called when your extension is deactivated
+-export function deactivate() { }
+\ No newline at end of file
++export function deactivate() { }
+
+...
+
+----------------------------------------
+FILE: vscode-nph/vsc-extension-quickstart.md
+----------------------------------------
+Changes made (46ccc3c^..master-backup):
+diff --git a/vscode-nph/vsc-extension-quickstart.md b/vscode-nph/vsc-extension-quickstart.md
+index 3d8ce06..5b3d85d 100644
+--- a/vscode-nph/vsc-extension-quickstart.md
++++ b/vscode-nph/vsc-extension-quickstart.md
+@@ -2,42 +2,65 @@
+ 
+ ## What's in the folder
+ 
+-* This folder contains all of the files necessary for your extension.
+-* `package.json` - this is the manifest file in which you declare your extension and command.
+-  * The sample plugin registers a command and defines its title and command name. With this information VS Code can show the command in the command palette. It doesn’t yet need to load the plugin.
+-* `src/extension.ts` - this is the main file where you will provide the implementation of your command.
+-  * The file exports one function, `activate`, which is called the very first time your extension is activated (in this case by executing the command). Inside the `activate` function we call `registerCommand`.
+-  * We pass the function containing the implementation of the command as the second parameter to `registerCommand`.
++- This folder contains all of the files necessary for your extension.
++- `package.json` - this is the manifest file in which you declare your extension
++  and command.
++  - The sample plugin registers a command and defines its title and command
++    name. With this information VS Code can show the command in the command
++    palette. It doesn’t yet need to load the plugin.
++- `src/extension.ts` - this is the main file where you will provide the
++  implementation of your command.
++  - The file exports one function, `activate`, which is called the very first
++    time your extension is activated (in this case by executing the command).
++    Inside the `activate` function we call `registerCommand`.
++  - We pass the function containing the implementation of the command as the
++    second parameter to `registerCommand`.
+ 
+ ## Get up and running straight away
+ 
+-* Press `F5` to open a new window with your extension loaded.
+-* Run your command from the command palette by pressing (`Ctrl+Shift+P` or `Cmd+Shift+P` on Mac) and typing `Hello World`.
+-* Set breakpoints in your code inside `src/extension.ts` to debug your extension.
+-* Find output from your extension in the debug console.
++- Press `F5` to open a new window with your extension loaded.
++- Run your command from the command palette by pressing (`Ctrl+Shift+P` or
++  `Cmd+Shift+P` on Mac) and typing `Hello World`.
++- Set breakpoints in your code inside `src/extension.ts` to debug your
++  extension.
++- Find output from your extension in the debug console.
+ 
+ ## Make changes
+ 
+-* You can relaunch the extension from the debug toolbar after changing code in `src/extension.ts`.
+-* You can also reload (`Ctrl+R` or `Cmd+R` on Mac) the VS Code window with your extension to load your changes.
++- You can relaunch the extension from the debug toolbar after changing code in
++  `src/extension.ts`.
++- You can also reload (`Ctrl+R` or `Cmd+R` on Mac) the VS Code window with your
++  extension to load your changes.
+ 
+
+...
+
