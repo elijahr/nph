@@ -3,16 +3,22 @@
 
 set -eo pipefail
 
-git diff --exit-code > /dev/null || { echo "Commit changes before doing a (potentially) large reformat!" ; exit 1 ; }
+git diff --exit-code >/dev/null || {
+  echo "Commit changes before doing a (potentially) large reformat!"
+  exit 1
+}
 
 git ls-files | grep ".nim$" | xargs -n1 nph
 
-! git diff --exit-code > /dev/null || { echo "This repository is already formatted" ; exit 0 ; }
+! git diff --exit-code >/dev/null || {
+  echo "This repository is already formatted"
+  exit 0
+}
 
 git commit -am "Formatted with nph $(nph --version)" --author "nph <nph@example.com>"
 
-echo "# Formatted with nph $(nph --version)" >> .git-blame-ignore-revs
-echo "$(git rev-parse HEAD)" >> .git-blame-ignore-revs
+echo "# Formatted with nph $(nph --version)" >>.git-blame-ignore-revs
+git rev-parse HEAD >>.git-blame-ignore-revs
 
 git add .git-blame-ignore-revs
 git commit -m "Add $(git rev-parse HEAD) to .git-blame-ignore-revs" --author "nph <nph@example.com>"

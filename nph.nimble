@@ -1,11 +1,11 @@
 # Package
 
-version       = "0.6.1"
-author        = "Jacek Sieka"
-description   = "Nim code formatter"
-license       = "MIT"
-srcDir        = "src"
-bin           = @["nph"]
+version = "0.6.1"
+author = "Jacek Sieka"
+description = "Nim code formatter"
+license = "MIT"
+srcDir = "src"
+bin = @["nph"]
 
 # Dependencies
 
@@ -27,7 +27,7 @@ task self, "Format nph itself":
   exec "git diff --no-ext-diff --quiet --exit-code"
 
   for file in listFiles("src"):
-    if file.len > 4 and file[^4..^1] == ".nim":
+    if file.len > 4 and file[^4 ..^ 1] == ".nim":
       echo file
       exec "./nph " & file
 
@@ -39,14 +39,11 @@ task f, "Format":
   # Sort tests so that 00_empty always is first, which makes it a convenient
   # experimentation ground :)
   for file in sorted(listFiles(".")):
-    if file.len > 4 and file[^4..^1] == ".nim":
+    if file.len > 4 and file[^4 ..^ 1] == ".nim":
       echo file
       exec "../../nph " & file & " --outDir:../after --debug"
 
-
-proc formatProject(
-  name, url, branch: string, dirs: openArray[string]
-) =
+proc formatProject(name, url, branch: string, dirs: openArray[string]) =
   if not dirExists("playground"):
     mkdir("playground")
   cd "playground/"
@@ -62,14 +59,13 @@ proc formatProject(
     try:
       exec "git ls-files | grep .nim$ | xargs nph"
       exec "git diff"
-    except: discard
+    except:
+      discard
     if dir.len > 0:
       cd ".."
   cd "../.."
 
-proc againProject(
-  name, url, branch: string, dirs: openArray[string]
-) =
+proc againProject(name, url, branch: string, dirs: openArray[string]) =
   if not dirExists("playground"):
     mkdir("playground")
   cd "playground/"
@@ -80,14 +76,13 @@ proc againProject(
     try:
       exec "git ls-files | grep .nim$ | xargs nph"
       exec "git diff"
-    except: discard
+    except:
+      discard
     if dir.len > 0:
       cd ".."
   cd "../.."
 
-proc commitProject(
-  name, url, branch: string, dirs: openArray[string]
-) =
+proc commitProject(name, url, branch: string, dirs: openArray[string]) =
   formatProject(name, url, branch, dirs)
 
   cd "playground/" & name

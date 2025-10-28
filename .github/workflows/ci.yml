@@ -68,6 +68,16 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
+    - name: Install OpenSSL (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        choco install openssl -y
+        if [ -d "/c/Program Files/OpenSSL-Win64/bin" ]; then
+          echo "/c/Program Files/OpenSSL-Win64/bin" >> $GITHUB_PATH
+        elif [ -d "/c/Program Files/OpenSSL/bin" ]; then
+          echo "/c/Program Files/OpenSSL/bin" >> $GITHUB_PATH
+        fi
+
     - uses: nim-lang/setup-nimble-action@v1
       with:
         nimble-version: 0.16.4
