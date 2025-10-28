@@ -86,11 +86,10 @@ jobs:
 
         echo "$openSslPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-        # Download pcre64.dll (not included with setup-nimble-action)
-        $dllDir = "$PWD\.nimble_runtime\bin"
-        New-Item -ItemType Directory -Force -Path $dllDir | Out-Null
-        Invoke-WebRequest -Uri "https://github.com/nim-lang/nightlies/releases/download/latest-devel/pcre64.dll" -OutFile "$dllDir\pcre64.dll"
-        echo "$dllDir" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        # Install Nim (includes pcre64.dll and nimble)
+        choco install nim -y --no-progress
+        $nimBin = (Get-ChildItem "C:\tools\Nim" -Directory -Filter "nim-*" | Select-Object -First 1 | ForEach-Object { Join-Path $_.FullName "bin" })
+        echo "$nimBin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
     - name: Install PCRE (Linux)
       if: runner.os == 'Linux'
@@ -101,6 +100,7 @@ jobs:
       run: brew install pcre
 
     - uses: nim-lang/setup-nimble-action@v1
+      if: runner.os != 'Windows'
       with:
         nimble-version: 0.20.1
         repo-token: ${{ secrets.GITHUB_TOKEN }}
