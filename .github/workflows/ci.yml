@@ -72,10 +72,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Install OpenSSL (Windows)
+    - name: Install dependencies (Windows)
       if: runner.os == 'Windows'
       shell: pwsh
       run: |
+        # Install OpenSSL 1.1.x (for nimble)
         choco install openssl --version=1.1.1.2100 -y --no-progress
 
         $openSslPath = "C:\Program Files\OpenSSL-Win64\bin"
@@ -84,6 +85,12 @@ jobs:
         }
 
         echo "$openSslPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+        # Download pcre64.dll (not included with setup-nimble-action)
+        $dllDir = "$PWD\.nimble_runtime\bin"
+        New-Item -ItemType Directory -Force -Path $dllDir | Out-Null
+        Invoke-WebRequest -Uri "https://github.com/nim-lang/nightlies/releases/download/latest-devel/pcre64.dll" -OutFile "$dllDir\pcre64.dll"
+        echo "$dllDir" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
     - name: Install PCRE (Linux)
       if: runner.os == 'Linux'
