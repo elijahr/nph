@@ -17,11 +17,10 @@ import pkg/parsetoml
 static:
   doAssert NimMajor == 2 and NimMinor == 2, "nph needs a specific version of Nim"
 
-type
-  NphConfig = object
-    exclude: seq[string]
-    extendExclude: seq[string]
-    includePatterns: seq[string]
+type NphConfig = object
+  exclude: seq[string]
+  extendExclude: seq[string]
+  includePatterns: seq[string]
 
 const
   Version = gorge("git describe --long --dirty --always --tags")
@@ -241,6 +240,7 @@ proc main() =
         for file in walkDirRec(key):
           if file.isNimFile:
             infiles &= file
+            explicitFiles.add(file) # Track explicitly passed files from dir
       else:
         let f = key.addFileExt(".nim")
         infiles.add(f)

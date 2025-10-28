@@ -3,37 +3,37 @@ name: github pages
 on:
   push:
     branches:
-      - master
-      - docs
+    - master
+    - docs
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: baptiste0928/cargo-install@v2
-        with:
-          crate: mdbook
-          version: 0.4.36
-      - uses: baptiste0928/cargo-install@v2
-        with:
-          crate: mdbook-toc
-          version: 0.14.1
-      - uses: baptiste0928/cargo-install@v2
-        with:
-          crate: mdbook-open-on-gh
-          version: 2.4.1
-      - uses: baptiste0928/cargo-install@v2
-        with:
-          crate: mdbook-admonish
-          version: 1.14.0
-      - name: Build book
-        run: |
-          PATH=.cargo/bin:$PATH mdbook build docs
+    - uses: actions/checkout@v3
+    - uses: baptiste0928/cargo-install@v2
+      with:
+        crate: mdbook
+        version: 0.4.36
+    - uses: baptiste0928/cargo-install@v2
+      with:
+        crate: mdbook-toc
+        version: 0.14.1
+    - uses: baptiste0928/cargo-install@v2
+      with:
+        crate: mdbook-open-on-gh
+        version: 2.4.1
+    - uses: baptiste0928/cargo-install@v2
+      with:
+        crate: mdbook-admonish
+        version: 1.14.0
+    - name: Build book
+      run: |
+        PATH=.cargo/bin:$PATH mdbook build docs
 
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/book
-          force_orphan: true
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/book
+        force_orphan: true

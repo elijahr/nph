@@ -44,6 +44,7 @@ echo $(git rev-parse HEAD) >> .git-blame-ignore-revs
 ```
 
 then configure git to use it:
+
 ```sh
 git config --global blame.ignoreRevsFile .git-blame-ignore-revs
 ```
@@ -55,19 +56,19 @@ introduces formatting changes.
 
 One of several things could have happened:
 
-* The code was not valid enough - `nph` can only parse valid Nim grammar and
+- The code was not valid enough - `nph` can only parse valid Nim grammar and
   while it would be nice to handle partially formatted stuff gracefully, we're
   not there yet.
-* The parser has a bug and is unable to parse valid Nim code
-  * Probably you can move some comments around to make it work!
-* the formatter has a bug and the resulting formatting is invalid
-  * Probably you can move some comments around to make it work!
-* the AST equivalence checker complains
-  * This often happens in complex expressions such as `do`  and parenthesis used
+- The parser has a bug and is unable to parse valid Nim code
+  - Probably you can move some comments around to make it work!
+- the formatter has a bug and the resulting formatting is invalid
+  - Probably you can move some comments around to make it work!
+- the AST equivalence checker complains
+  - This often happens in complex expressions such as `do` and parenthesis used
     for indent purposes where the Nim grammar has ambiguities and parsing
     complexity - it can usually be worked around by simplifying complex
     expressions, introducing a template or similar
-  * It could also be that the AST checker is too strict - the Nim parser will
+  - It could also be that the AST checker is too strict - the Nim parser will
     generate different AST:s depending on whitespace even if semantically there
     is no difference
 
@@ -78,32 +79,33 @@ If you have time, try to find the offending code snippet and submit an issue.
 
 ## Why the cited formatters in particular?
 
-* `black` because of our syntactic similarity with Python and its
+- `black` because of our syntactic similarity with Python and its
   [stability policy](https://black.readthedocs.io/en/stable/the_black_code_style/index.html#stability-policy)
-* `prettier` for its wisdom in how formatting [options](https://prettier.io/docs/en/option-philosophy)
-  are approached and for the closeness to user experience of its developers
-* `clang-format` for being the formatter that made me stop worrying about
+- `prettier` for its wisdom in how formatting
+  [options](https://prettier.io/docs/en/option-philosophy) are approached and
+  for the closeness to user experience of its developers
+- `clang-format` for being the formatter that made me stop worrying about
   formatting
-  * its secret sauce was treating formatting as a balancing of priorities rather
-    than a mechanical stringification using a [lowest-penalty](https://youtu.be/s7JmdCfI__c?t=640)
-    algorithm
+  - its secret sauce was treating formatting as a balancing of priorities rather
+    than a mechanical stringification using a
+    [lowest-penalty](https://youtu.be/s7JmdCfI__c?t=640) algorithm
 
 ## What is meant by consistency?
 
-* Similar constructs are formatted with similar rules
-  * Does it look like a list? Format it with list-like rules regardless if
-    its a parameter list, array of values or import list
-* Original styling is generally not preserved - instead, the formatting is based
+- Similar constructs are formatted with similar rules
+  - Does it look like a list? Format it with list-like rules regardless if its a
+    parameter list, array of values or import list
+- Original styling is generally not preserved - instead, the formatting is based
   on the semantic structure of the program
-* Spacing emphasizes structure and control flow to help you read the code
+- Spacing emphasizes structure and control flow to help you read the code
 
 `nph` makes your code consistent without introducing hobgoblins in your mind!
 
 ## Why are there no options?
 
-The aim of `nph` is to create a single consistent style that allows you to
-focus on programming while `nph` takes care of the formatting, even across
-different codebases and authors.
+The aim of `nph` is to create a single consistent style that allows you to focus
+on programming while `nph` takes care of the formatting, even across different
+codebases and authors.
 
 Consistency helps reading speed by removing unique and elaborate formatting
 distractions, allowing you, the experienced programmer, to derive structural
@@ -124,7 +126,8 @@ outcome relates to the above styling priorities.
 When in doubt, look at what other opinionated formatters have done and link to
 it!
 
-Eventually, the plan is to adopt a [stability policy](https://black.readthedocs.io/en/stable/the_black_code_style/index.html#stability-policy)
+Eventually, the plan is to adopt a
+[stability policy](https://black.readthedocs.io/en/stable/the_black_code_style/index.html#stability-policy)
 similar to `black`, meaning that style changes will still be accepted, but
 introduced only rarely so that you don't have to worry about massive PR-breaking
 formatting diffs all the time.
@@ -132,8 +135,8 @@ formatting diffs all the time.
 ## Why does the formatting code look an awful lot like the Nim compiler renderer?
 
 Because it is based on it, of course! As a starting point this is fine but the
-code would benefit greatly from being rewritten with a dedicated formatting
-AST - and here we are.
+code would benefit greatly from being rewritten with a dedicated formatting AST
+\- and here we are.
 
 ## Should it be upstreamed?
 
@@ -166,9 +169,9 @@ recommendation.
 
 ## What about comments?
 
-Comments may appear in many different places that are not represented in the
-Nim AST. When `nph` reformats code, it may have to move comments around in order
-to maintain line lengths and introduce or remove indentation.
+Comments may appear in many different places that are not represented in the Nim
+AST. When `nph` reformats code, it may have to move comments around in order to
+maintain line lengths and introduce or remove indentation.
 
 `nph` uses heuristics to place comments into one of several categories which
 broadly play by similar rules that code does - in particular, indentation is
@@ -176,16 +179,16 @@ used to determine "ownership" over the comment.
 
 The implementation currently tracks several comment categories:
 
-* comment statement nodes - comments that appear with regular indent in
+- comment statement nodes - comments that appear with regular indent in
   statement list contexts (such as the body of a `proc`) as represented as such,
   ie as statement nodes and get treated similar to how regular code would
-* node attachments - comments that are anchored to an AST node depending on
+- node attachments - comments that are anchored to an AST node depending on
   their location in the code relative to that node:
-  * prefix - anything leading up to a particular AST node - for example less
+  - prefix - anything leading up to a particular AST node - for example less
     indented or otherwise appearing before the node
-  * mid - at midpoints in composite nodes - between the `:` and the body of an
+  - mid - at midpoints in composite nodes - between the `:` and the body of an
     `if` for example
-  * postfix - appearing after the node, meaning on the same line or more
+  - postfix - appearing after the node, meaning on the same line or more
     indented than the node
 
 When rendering the code, `nph` will use these categories to guide where the
@@ -200,19 +203,19 @@ exists to represent them.
 
 `nph` current will:
 
-* generally retain blank space in code but normalise it to a single line
-* insert blanks around complex statements
+- generally retain blank space in code but normalise it to a single line
+- insert blanks around complex statements
 
 This strategy is expected to evolve over time, including the meaning of
 "complex".
 
 ## What features will likely not be added?
 
-* formatting options - things that change the way the formatting is done for
+- formatting options - things that change the way the formatting is done for
   aesthetic reasons - exceptions here might include options that increase
   compatiblity (for example with older Nim versions)
-* semantic refactoring - the focus is on style only
-  * `import` reording in particular changes order in which code executes!
+- semantic refactoring - the focus is on style only
+  - `import` reording in particular changes order in which code executes!
 
 ## What's with the semicolons?
 
@@ -224,8 +227,8 @@ Parameters in particular are parsed using identifier groups where each group
 consists of one or more names followed by an option type and default.
 
 Names are separated by `,` - if the type and default are missing, a `;` is
-needed to start a new group or the name would be added to the previous group
-if a `;` was used originally to create a new group.
+needed to start a new group or the name would be added to the previous group if
+a `;` was used originally to create a new group.
 
 However, if the group has a default, `;` cannot be parsed because it's swallowed
 in certain cases (`proc` implementations in particular) by the default value
@@ -233,8 +236,8 @@ parsing.
 
 As such, `nph` will normalise usage of `,` and `;` to:
 
-* Use `,` after a group that has a type and/or default
-* Use `;` otherwise
+- Use `,` after a group that has a type and/or default
+- Use `;` otherwise
 
 Regardless, you can usually type either and `nph` will clean it up in such a way
 that the AST remains unambiguous, compatible with all possible values and in

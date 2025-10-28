@@ -19,7 +19,9 @@ echo "echo 1" | nph -
 
 ## Disabling formatting locally
 
-You can mark a code section with `#!fmt: off` and `#!fmt: on` to disable formatting locally:
+You can mark a code section with `#!fmt: off` and `#!fmt: on` to disable
+formatting locally:
+
 ```nim
 proc      getsFormatted(a, b : int    ) = discard
 
