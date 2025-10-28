@@ -21,6 +21,9 @@ jobs:
     - name: Install pre-commit
       run: pip install pre-commit
 
+    - name: Install PCRE
+      run: sudo apt-get update && sudo apt-get install -y libpcre3
+
     - name: Set up Nimble
       uses: nim-lang/setup-nimble-action@v1
       with:
@@ -65,18 +68,61 @@ jobs:
       run: |
         git config --global core.autocrlf false
         git config --global core.eol lf
+
+    - name: Install dependencies (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        choco install openssl pcre -y --no-progress
+
+        # Find OpenSSL installation
+        $openSslPath = "C:\Program Files\OpenSSL-Win64\bin"
+        if (-Not (Test-Path $openSslPath)) {
+          $openSslPath = "C:\Program Files\OpenSSL\bin"
+        }
+
+        # Verify DLL exists
+        if (Test-Path "$openSslPath\libcrypto-1_1-x64.dll") {
+          Write-Host "✓ Found libcrypto-1_1-x64.dll at $openSslPath"
+        } else {
+          Write-Host "✗ Warning: libcrypto-1_1-x64.dll not found at $openSslPath"
+          Write-Host "`nDebug: Searching for OpenSSL installation..."
+
+          # List OpenSSL directories
+          Write-Host "`nOpenSSL directories in Program Files:"
+          Get-ChildItem "C:\Program Files" -Directory -Filter "OpenSSL*" -ErrorAction SilentlyContinue | ForEach-Object {
+            Write-Host "  - $($_.FullName)"
+            Get-ChildItem $_.FullName -Recurse -ErrorAction SilentlyContinue | Select-Object -First 20 | ForEach-Object {
+              Write-Host "    $($_.FullName)"
+            }
+          }
+
+          # Search for all libcrypto DLLs
+          Write-Host "`nSearching for libcrypto*.dll files:"
+          Get-ChildItem "C:\Program Files" -Recurse -Filter "libcrypto*.dll" -ErrorAction SilentlyContinue | ForEach-Object {
+            Write-Host "  Found: $($_.FullName)"
+          }
+
+          # Check chocolatey package info
+          Write-Host "`nChocolatey OpenSSL package info:"
+          choco list --local-only openssl
+
+          # Check current PATH
+          Write-Host "`nCurrent PATH entries (OpenSSL related):"
+          $env:PATH -split ';' | Where-Object { $_ -like "*OpenSSL*" } | ForEach-Object {
+            Write-Host "  - $_"
+          }
+        }
+
+        # Update PATH for future steps
+        echo "$openSslPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Install OpenSSL (Windows)
-      if: runner.os == 'Windows'
-      run: |
-        choco install openssl -y
-        if [ -d "/c/Program Files/OpenSSL-Win64/bin" ]; then
-          echo "/c/Program Files/OpenSSL-Win64/bin" >> $GITHUB_PATH
-        elif [ -d "/c/Program Files/OpenSSL/bin" ]; then
-          echo "/c/Program Files/OpenSSL/bin" >> $GITHUB_PATH
-        fi
+    - name: Install PCRE (Linux)
+      if: runner.os == 'Linux'
+      run: sudo apt-get update && sudo apt-get install -y libpcre3
 
     - uses: nim-lang/setup-nimble-action@v1
       with:
