@@ -45,6 +45,12 @@ jobs:
           nimble-version: '0.20.1'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Setup cligen fork globally (to override transitive dependency)
+        run: |
+          git clone --branch fix-implicit-decl https://github.com/elijahr/cligen.git ../cligen
+          cd ../cligen
+          nimble develop --global -y
+
       - name: Build nph
         run: |
            nimble build
