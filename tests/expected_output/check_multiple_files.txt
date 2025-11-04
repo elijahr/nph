@@ -1,0 +1,5 @@
+would reformat tests/before/fmton.nim
+would reformat tests/before/comments.nim
+
+Oh no! 💥 🚧 💥
+2 files would be reformatted, 1 file would be left unchanged.

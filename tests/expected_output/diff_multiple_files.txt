@@ -1,0 +1,476 @@
+--- tests/before/fmton.nim
++++ tests/before/fmton.nim (formatted)
+@@ -10,7 +10,7 @@
+     [1, 2, 3]
+ 
+ #!fmt: on
+-proc hanging(indent: int,
+-             isUgly = true) = discard
++proc hanging(indent: int, isUgly = true) =
++  discard
+ 
+ block:
+@@ -19,7 +19,8 @@
+     discard
+   #!fmt: on
+ 
+-  if         false: discard
++  if false:
++    discard
+ 
+ #!fmt: off
+ #[ block comment ]# # trailing comment should stay
+--- tests/before/comments.nim
++++ tests/before/comments.nim (formatted)
+@@ -13,6 +13,5 @@
+ #
+ # Comment
+ #
+-
+ 
+ #[ a multiline comment
+@@ -49,6 +48,6 @@
+ ]##
+ # trailing doc comment on same line
+ 
+-template x =
++template x() =
+   ## A template doc comment
+   try:
+@@ -62,41 +61,45 @@
+   LonelyObject* = object
+ 
+ type
+-  SingleValueSetting* {.pure.} = enum ## \
+-                      ## settings resulting in a single string value
+-    arguments,        ## experimental: the arguments passed after '-r'
+-    backend           ## the backend (eg: c|cpp|objc|js); both `nim doc --backend:js`
+-                      ## and `nim js` would imply backend=js
++  SingleValueSetting* {.pure.} = enum
++    ## \
++    ## settings resulting in a single string value
++    arguments ## experimental: the arguments passed after '-r'
++    backend
++      ## the backend (eg: c|cpp|objc|js); both `nim doc --backend:js`
++      ## and `nim js` would imply backend=js
+     gc {.deprecated.} ## gc selected
+-    mm                ## memory management selected
++    mm ## memory management selected
+ 
+   FileSeekPos* = enum
+     fspEnd ## Seek relative to end
+     # text file handling:
++
+   ## Position relative to which seek should happen.
+   # The values are ordered so that they match with stdio
+   # SEEK_SET, SEEK_CUR and SEEK_END respectively.
+-
+-  Object = object # comment
++  Object = object
++    # comment
+     ## more comment
+     field: int # Field comment
+     # comment between fields
+     field2: int ## Field comment again
+-    fiiiiiiiiiiiiiiiiiiiiiiiieeeeeeeeeld: int # loooooooooooooooooooong comment past the max line length
++    fiiiiiiiiiiiiiiiiiiiiiiiieeeeeeeeeld: int
++      # loooooooooooooooooooong comment past the max line length
+ 
+     docfield, ## Doc comment after comma
+       docfield2, ## Doc comment again
+-                 ## Multiline
++        ## Multiline
+       docfield3: int ## here came the type
++
+   # and here
+-
+   NewlineObject = object
+     field: int ## doc comment after field
+     ## doc comment continues, though not as a postfix - empty line after
+-
+     field2: int ## just a doc again
+ 
+-  Inherited = object of RootObj # inherited eol comment
+-                                # inherited next line indent comments
++  Inherited = object of RootObj
++    # inherited eol comment
++    # inherited next line indent comments
+     f: int
+ 
+@@ -105,16 +108,18 @@
+     of true, false: # of eol
+       v: string # case field eol
+ 
+-  SomeAlias* = int ## alias eol
++  SomeAlias* = int
++    ## alias eol
+     ## alias next
+ 
+-  SomeAlias2 {.nodecl.} # after pragma
+-    = int ## alias2 eol
++  SomeAlias2 {.nodecl.} = # after pragma
++    int ## alias2 eol
+ 
+   SomeAlias3 # alias after symbol
+     [T] = # alias after equals
+-    int # alias after type
++      int # alias after type
+ 
+-  SomeAlias4 = SomeAlias3[int] ## after alias4
++  SomeAlias4 = SomeAlias3[int]
++    ## after alias4
+     ## more after alias4
+ 
+@@ -123,6 +128,6 @@
+     proc(v: int)
+ 
+   SomeAlias6 = ##
+-      ## doc comment after equals before proc continued
++    ## doc comment after equals before proc continued
+     proc(v: int)
+ 
+@@ -131,15 +136,18 @@
+     when false: # when object false line
+       discard
+ 
+-  NoField0* = object of RootObj ## comment eol
+-                                ## comment nl
++  NoField0* = object of RootObj
++    ## comment eol
++    ## comment nl
+ 
+-  NoField1* = object of RootObj ## comment nofield1 eol
+-                                ## comment nl
++  NoField1* = object of RootObj
++    ## comment nofield1 eol
++    ## comment nl
+ 
+-  CommentedTuple* = tuple
+-    ## Comment here
+-    field: int ## comment tuple field
+-    field2: int ## comment tuple field2
++  CommentedTuple* =
++    tuple
++      ## Comment here
++      field: int ## comment tuple field
++      field2: int ## comment tuple field2
+ 
+   CommentedTuple2* =
+@@ -178,6 +186,6 @@
+   discard
+ 
+ if true:
+-# if dedented colon line
++  # if dedented colon line
+   discard
+ # before else dedented
+@@ -202,19 +210,18 @@
+   # finally last line
+ 
+ try:
+-# try first dedent line
++  # try first dedent line
+   f()
+ # try last dedent line
+ except:
+-# except dedent first line
++  # except dedent first line
+   discard
+ # except dedent last line
+ finally:
+-# finally first dedent line
++  # finally first dedent line
+   discard
+ # finally last dedent line
+ 
+-
+-for i in 0..1: # for colon line
++for i in 0 .. 1: # for colon line
+   # for first line
+   discard
+@@ -227,6 +234,6 @@
+   # case else first line
+   discard
+ 
+-f do -> int: # do colon line
++f do() -> int: # do colon line
+   # do first line
+   discard
+@@ -252,8 +259,9 @@
+ discard Object( # object eol
+   # object first line
+   field: 0, # field line
+-  field2: # field colon line
++  field2:
++    # field colon line
+     # Field colon next line
+-    42
++    42,
+ )
+ 
+@@ -267,6 +275,6 @@
+ ## needs to be double
+ 
+ abc and
+-# dedented comment in infix
++  # dedented comment in infix
+   def
+ 
+@@ -275,11 +283,13 @@
+   def
+ 
+ if abc and
+-# dedented comment in infix
+-   def: discard
++    # dedented comment in infix
++    def:
++  discard
+ 
+ if abc and
+-   # indented comment in infix
+-   def: discard
++    # indented comment in infix
++    def:
++  discard
+ 
+ a(
+@@ -287,11 +297,11 @@
+ )
+ 
+ a(
+-  b = c
+-# dedented comment after keyword parameter
++  b = c # dedented comment after keyword parameter
+ )
+ 
+-{.pragma # comment here
+- .}
++{.
++  pragma # comment here
++.}
+ 
+ let v = 52 # let all on one line
+@@ -307,15 +317,19 @@
+ 
+ let # let eol
+   v # let ident after symbol
+- : # let ident after colon
+-    int # let ident after type
+- = # let ident after equals
++  :
++    # let ident after colon
++    int =
++    # let ident after type
++    # let ident after equals
+     42 # let ident after value
+ 
+ const # const eol
+   v # const ident after symbol
+- : # const ident after colon
+-    int # const ident after type
+- = # const ident after equals
++  :
++    # const ident after colon
++    int =
++    # const ident after type
++    # const ident after equals
+     42 # const ident after value
+ 
+@@ -329,19 +343,21 @@
+   b = 5
+   # const section postfix
+ 
+-discard # discard eol
++discard
++  # discard eol
+   # discard first line
+   54 # discard value
+ 
+-proc x = discard # proc, impl and comment on one line
++proc x() =
++  discard # proc, impl and comment on one line
+ 
+-proc # after proc before indented name
+-  xxx = discard
++proc xxx() = # after proc before indented name
++  discard
+ 
+-proc xxxx = # proc eq line
++proc xxxx() = # proc eq line
+   # proc first line
+   discard
+ 
+-proc x =
++proc x() =
+   ## A proc doc comment
+   if true:
+@@ -350,19 +366,21 @@
+     for i in 0 ..< numberOfCharsRead:
+       discard
+ 
+-proc x = discard
++proc x() =
+   ## indented doc comment for proc
+   ## that is long
++  discard
+ 
+-proc x = echo a.b
++proc x() =
+   ## indented doc comment for proc
+   ## with a dotexpr and a command
++  echo a.b
+ 
+-proc f: bool =
++proc f(): bool =
+   ## Comment here
+   ## another
+   (true or false)
+ 
+-proc f: bool =
++proc f(): bool =
+   ## Comment here
+   ## another
+@@ -378,21 +396,27 @@
+     else:
+       false
+ 
+-proc f =
++proc f() =
+   ## Doc comment only
+ 
+-proc f =
++proc f() =
+   ## Doc comment only
+   ## even two lines
+ 
+-proc a(v#[block]#: int, abc: int)
++proc a(
++  v #[block]#
++  : int,
++  abc: int,
++)
+ 
+-proc a(): int = 42
++proc a(): int =
+   ## Doc comment that needs body reordering
+   ## even two lines again
++  42
+ 
+ proc a(
+-  param: int, ## doc comment here
+-) = discard
++    param: int, ## doc comment here
++) =
++  discard
+ 
+ command "a", "b", "c" # command eol comment
+@@ -404,7 +428,6 @@
+ command "first arg"
+ # comment after command
+ 
+-command 234
+-  # command after ind
++command 234 # command after ind
+ 
+ when false:
+@@ -431,12 +454,12 @@
+ if true:
+   echo dotexpr.dot # after dotexpr in command ind
+   # between two dotepxrs ind
++
+   dotexpr
+   # between dotexpr and dotonnewline ind
+   .dotonnewline
+ 
+ block:
+-  f
+-  .x
++  f.x
+   # comment between the dots
+   .z()
+@@ -445,15 +468,9 @@
+ 
+   # after dotexpr ind
+ 
+-
+-
+ block:
+   # no whitespace between the next two multilines
+-  functionCall(
+-    param
+-  )
+-  functionCall(
+-    param
+-  )
++  functionCall(param)
++  functionCall(param)
+ 
+ block:
+@@ -463,6 +480,7 @@
+ 
+ discard
+   # infix pre par
+-  ( # infix parle
++  (
++    # infix parle
+     # infix prefix
+     a and # infix post-operator
+@@ -475,40 +493,28 @@
+   # dedented comment post discard
+ 
+ block:
+-  if  # some conditions:
+-    2 >= 1 and
+-    2 >= 1 and
+-    2 >= 1:
++  if 2 >= 1 and 2 >= 1 and 2 >= 1: # some conditions:
+     discard
+-  elif # some elif conds
+-    2 >= 1 and
+-    2 >= 1 and
+-    2 >= 1:
++  elif 2 >= 1 and 2 >= 1 and 2 >= 1: # some elif conds
+     discard
+ 
+-  if  # some conditions with a very long comment that wont fit on a line abacacsdcasdcasdsdcsdcsdc
+-    2 >= 1 and
+-    2 >= 1 and
+-    2 >= 1:
++  if 2 >= 1 and 2 >= 1 and 2 >= 1:
++    # some conditions with a very long comment that wont fit on a line abacacsdcasdcasdsdcsdcsdc
+     discard
+ 
+-  if
+-    2 >= 1 and
+-    # some conditions
+-    2 >= 1 and
+-    2 >= 1:
++  if 2 >= 1 and
++      # some conditions
++      2 >= 1 and 2 >= 1:
+     discard
+ 
+-  while  # some conditions:
+-    2 >= 1 and
+-    2 >= 1 and
+-    2 >= 1:
++  while 2 >= 1 and 2 >= 1 and 2 >= 1: # some conditions:
+     discard
+ 
+-  case # comment
++  case
++  # comment
+   true
+-  of # comment
+-    true:
+-      discard
+-  else #comment
+-    : discard
++  of true: # comment
++    discard
++  else: #comment
++    discard
++
+
+All done! ✨ 👑 ✨
+2 files would be reformatted, 1 file would be left unchanged.
