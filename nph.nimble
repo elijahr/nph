@@ -122,3 +122,7 @@ task again, "Format code formatted by replay (instead of raw code)":
 task replay, "Commit formatted sources":
   for p in projects:
     commitProject(p[0], p[1], p[2], p[3])
+
+task test, "Run formatter tests":
+  build()
+  exec "nim c -r tests/test_formatter.nim"

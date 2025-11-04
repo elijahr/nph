@@ -1,0 +1,1 @@
+[Error] --color can only be used with --diff

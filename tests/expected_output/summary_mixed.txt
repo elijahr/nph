@@ -1,0 +1,4 @@
+would reformat tests/before/fmton.nim
+
+Oh no! 💥 💔 💥
+1 file would be reformatted, 2 files would be left unchanged.

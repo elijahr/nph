@@ -1,0 +1,1 @@
+[Error] out cannot be used alongside directories
