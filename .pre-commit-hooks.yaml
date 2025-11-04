@@ -1,0 +1,6 @@
+- id: nph
+  name: nph
+  description: nph - opinionated Nim code formatter
+  entry: nph
+  language: system
+  files: \.nim(s|ble)?$

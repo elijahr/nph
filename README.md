@@ -4,9 +4,10 @@
 take the drudgery of manual formatting out of your coding day.
 
 Following the great tradition of [`black`](https://github.com/psf/black/),
-[`prettier`](https://prettier.io/), [`clang-format`](https://clang.llvm.org/docs/ClangFormat.html)
-and other AST-based formatters, it discards existing styling to create a
-consistent and beautiful codebase.
+[`prettier`](https://prettier.io/),
+[`clang-format`](https://clang.llvm.org/docs/ClangFormat.html) and other
+AST-based formatters, it discards existing styling to create a consistent and
+beautiful codebase.
 
 ## Documentation
 
@@ -71,7 +72,9 @@ More information about features and style available from the
 
 ## Installation
 
-Binaries are available from the [releases page](https://github.com/arnetheduck/nph/releases/tag/latest) on Github.
+Binaries are available from the
+[releases page](https://github.com/arnetheduck/nph/releases/tag/latest) on
+Github.
 
 `nph` can be also compiled or installed using `nimble` v0.16.4+:
 
@@ -84,14 +87,50 @@ nimble setup -l
 nimble build
 ```
 
-See the [installation instructions](https://arnetheduck.github.io/nph/installation.html) in the manual for more details.
+See the
+[installation instructions](https://arnetheduck.github.io/nph/installation.html)
+in the manual for more details.
 
 ## Editor integration
 
-Editor integrations are described [in the manual](https://arnetheduck.github.io/nph/installation.html#editor-integration).
+Editor integrations are described
+[in the manual](https://arnetheduck.github.io/nph/installation.html#editor-integration).
 
 ## Continuous integration
 
-Check out the [companion Github Action](https://github.com/arnetheduck/nph-action) for a convenient CI option!
+Check out the
+[companion Github Action](https://github.com/arnetheduck/nph-action) for a
+convenient CI option!
 
+## pre-commit support
 
+`nph` can be used with [pre-commit](https://pre-commit.com/). Add this to your
+`.pre-commit-config.yaml`:
+
+```yaml
+repos:
+  - repo: https://github.com/arnetheduck/nph
+    rev: v0.6.1  # Use the ref you want to point at
+    hooks:
+      - id: nph
+```
+
+This will automatically format your Nim files on commit.
+
+**Note**: This requires `nph` to be installed on your system. See
+[installation instructions](https://arnetheduck.github.io/nph/installation.html).
+
+### For nph developers
+
+The nph repository itself uses pre-commit with multiple hooks. To set it up:
+
+```sh
+# Install pre-commit hooks
+pre-commit install
+
+# Run on all files (optional)
+pre-commit run --all-files
+```
+
+This will automatically run nph on Nim files, plus format/lint checks for YAML,
+TOML, Markdown, and shell scripts.

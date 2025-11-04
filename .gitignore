@@ -1,12 +1,18 @@
+# Nimble stuff
 nimbledeps
-/nph
 nimble.develop
 nimble.paths
+
+# Build artifacts
+playground/
+*.dSYM/
+/tests/test_formatter
+/nph
+/src/nph
 *.exe
 *.dSYM/
+
+# Ignore .nph.yaml debug files except in test fixtures
 *.nph.yaml
-!tests/after/*.nph.yaml
-!tests/before/*.nph.yaml
-tests/test_formatter
-playground/
-/src/nph
+!/tests/before/*.nph.yaml
+!/tests/after/*.nph.yaml
