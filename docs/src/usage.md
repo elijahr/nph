@@ -159,9 +159,32 @@ Specify a config file to use. Default is `.nph.toml` if it exists.
 nph --config:custom.toml src/
 ```
 
+## Integration with pre-commit
+
+`nph` can be integrated with [pre-commit](https://pre-commit.com/) to
+automatically format Nim files before committing.
+
+Add this to your `.pre-commit-config.yaml`:
+
+```yaml
+repos:
+  - repo: https://github.com/arnetheduck/nph
+    rev: v0.6.1  # Use the ref you want to point at
+    hooks:
+      - id: nph
+```
+
+This will automatically format your Nim files on commit.
+
+**Note**: This requires `nph` to be installed on your system. The hook uses
+`language: system`, which means it will use your globally installed `nph`
+binary.
+
 ## Disabling formatting locally
 
-You can mark a code section with `#!fmt: off` and `#!fmt: on` to disable formatting locally:
+You can mark a code section with `#!fmt: off` and `#!fmt: on` to disable
+formatting locally:
+
 ```nim
 proc      getsFormatted(a, b : int    ) = discard
 

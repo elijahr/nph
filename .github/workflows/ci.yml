@@ -11,12 +11,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: linux_x64
-            builder: ubuntu-latest
-          - name: macosx_x64
-            builder: macos-latest
-          - name: windows_x64
-            builder: windows-latest
+        - name: linux_x64
+          builder: ubuntu-latest
+        - name: macosx_x64
+          builder: macos-latest
+        - name: windows_x64
+          builder: windows-latest
     defaults:
       run:
         shell: bash
@@ -24,35 +24,36 @@ jobs:
     name: CI '${{ matrix.name }}'
     runs-on: ${{ matrix.builder }}
     steps:
-      - name: Set git to use LF
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-      - name: Checkout
-        uses: actions/checkout@v4
+    - name: Set git to use LF
+      run: |
+        git config --global core.autocrlf false
+        git config --global core.eol lf
+    - name: Checkout
+      uses: actions/checkout@v4
 
-      - name: Download and setup Nim DLLs (Windows)
-        if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          curl -L -o dlls.zip https://nim-lang.org/download/dlls.zip
-          unzip dlls.zip -d nim-dlls
-          echo "$GITHUB_WORKSPACE/nim-dlls" >> $GITHUB_PATH
-          echo "SSL_CERT_FILE=$GITHUB_WORKSPACE/nim-dlls/cacert.pem" >> $GITHUB_ENV
+    # This can be removed once https://github.com/nim-lang/setup-nimble-action/pull/10 is released
+    - name: Download and setup Nim DLLs (Windows)
+      if: runner.os == 'Windows'
+      shell: bash
+      run: |
+        curl -L -o dlls.zip https://nim-lang.org/download/dlls.zip
+        unzip dlls.zip -d nim-dlls
+        echo "$GITHUB_WORKSPACE/nim-dlls" >> $GITHUB_PATH
+        echo "SSL_CERT_FILE=$GITHUB_WORKSPACE/nim-dlls/cacert.pem" >> $GITHUB_ENV
 
-      - uses: nim-lang/setup-nimble-action@v1
-        with:
-          nimble-version: '0.20.1'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: nim-lang/setup-nimble-action@v1
+      with:
+        nimble-version: 0.20.1
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build nph
-        run: |
-           nimble build
+    - name: Build nph
+      run: |
+        nimble build
 
-      - name: Check formatting
-        run: |
-          ! ./nph --check tests/before
-          ./nph --check tests/after
+    - name: Run tests
+      run: |
+        nimble test
 
-          ./nph src
-          git diff --exit-code
+    - name: Check self formatting
+      run: |
+        ./nph --check --diff .

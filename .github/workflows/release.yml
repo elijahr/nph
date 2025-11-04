@@ -2,10 +2,10 @@ name: Binaries
 on:
   push:
     branches:
-      - master
-      - release
+    - master
+    - release
     tags:
-      - "v*"
+    - v*
   workflow_dispatch:
 
 
@@ -15,35 +15,35 @@ jobs:
       fail-fast: false
       matrix:
         target:
-          - os: linux
-            name: linux_x64
-          - os: linux
-            name: linux_x32
-          - os: linux
-            name: linux_arm64
-          - os: linux
-            name: linux_armv7l
-          - os: macosx
-            name: macosx_x64
-          - os: macosx
-            name: macosx_arm64
-          - os: windows
-            name: windows_x64
+        - os: linux
+          name: linux_x64
+        - os: linux
+          name: linux_x32
+        - os: linux
+          name: linux_arm64
+        - os: linux
+          name: linux_armv7l
+        - os: macosx
+          name: macosx_x64
+        - os: macosx
+          name: macosx_arm64
+        - os: windows
+          name: windows_x64
         include:
-          - target:
-              os: linux
-            builder: ubuntu-22.04
-          - target:
-              os: macosx
-              name: macosx_x64
-            builder: macos-13
-          - target:
-              os: macosx
-              name: macosx_arm64
-            builder: macos-14
-          - target:
-              os: windows
-            builder: windows-2019
+        - target:
+            os: linux
+          builder: ubuntu-22.04
+        - target:
+            os: macosx
+            name: macosx_x64
+          builder: macos-13
+        - target:
+            os: macosx
+            name: macosx_arm64
+          builder: macos-14
+        - target:
+            os: windows
+          builder: windows-2019
     defaults:
       run:
         shell: bash
@@ -51,54 +51,54 @@ jobs:
     name: Release '${{ matrix.target.name }}'
     runs-on: ${{ matrix.builder }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
 
-      - name: Install nimble
-        uses: nim-lang/setup-nimble-action@v1
-        with:
-          nimble-version: '0.16.4'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Install nimble
+      uses: nim-lang/setup-nimble-action@v1
+      with:
+        nimble-version: 0.16.4
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build nph
-        run: |
-          nimble build -d:release
+    - name: Build nph
+      run: |
+        nimble build -d:release
 
-      - name: Create archive
-        run: |
-          tar -c -z -v -f nph-${{ matrix.target.name }}.tar.gz `ls nph{,.exe} 2>/dev/null || true`
+    - name: Create archive
+      run: |
+        tar -c -z -v -f nph-${{ matrix.target.name }}.tar.gz `ls nph{,.exe} 2>/dev/null || true`
 
-      - name: Upload the binaries
-        uses: actions/upload-artifact@v4
-        with:
-          name: nph-${{ matrix.target.name }}.tar.gz
-          path: nph-${{ matrix.target.name }}.tar.gz
-  
+    - name: Upload the binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: nph-${{ matrix.target.name }}.tar.gz
+        path: nph-${{ matrix.target.name }}.tar.gz
+
   vsix:
     name: Build .vsix file
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
 
-      - name: Install deps
-        run: |
-          cd vscode-nph
-          yarn      
-      
-      - name: Build .vsix extension
-        id: buildext
-        uses: HaaLeo/publish-vscode-extension@v2
-        with:
-          pat: "dummyVal"
-          packagePath: ./vscode-nph
-          dryRun: true
+    - name: Install deps
+      run: |
+        cd vscode-nph
+        yarn
 
-      - name: Upload extension
-        uses: actions/upload-artifact@v4
-        with:
-          name: vscode-nph.vsix
-          path: ${{steps.buildext.outputs.vsixPath}}
+    - name: Build .vsix extension
+      id: buildext
+      uses: HaaLeo/publish-vscode-extension@v2
+      with:
+        pat: dummyVal
+        packagePath: ./vscode-nph
+        dryRun: true
+
+    - name: Upload extension
+      uses: actions/upload-artifact@v4
+      with:
+        name: vscode-nph.vsix
+        path: ${{steps.buildext.outputs.vsixPath}}
 
   create-github-release:
     name: Create Github Release
@@ -107,34 +107,34 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Download artefacts
-        uses: actions/download-artifact@v4
+    - name: Download artefacts
+      uses: actions/download-artifact@v4
 
-      - name: Clean up prerelease
-        if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
-        run: |
-          gh release delete "prerelease" --cleanup-tag --yes --repo $GITHUB_REPOSITORY || true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Clean up prerelease
+      if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
+      run: |
+        gh release delete "prerelease" --cleanup-tag --yes --repo $GITHUB_REPOSITORY || true
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: ncipollo/release-action@v1
-        if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
-        with:
-          name: Continuous prerelease
-          artifacts: "*/*"
-          allowUpdates: true
-          prerelease: true
-          tag: prerelease
+    - uses: ncipollo/release-action@v1
+      if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
+      with:
+        name: Continuous prerelease
+        artifacts: '*/*'
+        allowUpdates: true
+        prerelease: true
+        tag: prerelease
 
-      - uses: ncipollo/release-action@v1
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
-        with:
-          name: nph ${{github.ref}}
-          artifacts: "*/*"
-          allowUpdates: false
+    - uses: ncipollo/release-action@v1
+      if: ${{ startsWith(github.ref, 'refs/tags/') }}
+      with:
+        name: nph ${{github.ref}}
+        artifacts: '*/*'
+        allowUpdates: false
 
-      - name: Delete artefacts
-        uses: geekyeggo/delete-artifact@v2
-        with:
-          failOnError: false
-          name: "nph-*"
+    - name: Delete artefacts
+      uses: geekyeggo/delete-artifact@v2
+      with:
+        failOnError: false
+        name: nph-*
