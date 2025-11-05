@@ -46,13 +46,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build nph
-        run: |
-           nimble build
+        run: nimble build
 
-      - name: Check formatting
-        run: |
-          ! ./nph --check tests/before
-          ./nph --check tests/after
-
-          ./nph src
-          git diff --exit-code
+      - name: Run tests
+        run: nimble test
