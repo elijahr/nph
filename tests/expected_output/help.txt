@@ -1,0 +1,23 @@
+nph - Nim formatter prerelease-9-gec0a3d7-dirtyUsage:
+  nph [options] nimfiles...
+
+Options:
+  --check               check the formatting instead of performing it
+  --diff                show diff of formatting changes without writing files
+  --out:file            set the output file (default: overwrite the input file)
+  --outDir:dir          set the output dir (default: overwrite the input files)
+  --color               force colored diff output (only applies when --diff is given)
+  --no-color            disable colored diff output
+  --exclude:pattern     regex pattern for files/dirs to exclude (overrides defaults)
+  --extend-exclude:pattern  regex pattern to add to default exclusions
+  --include:pattern     regex pattern for files to include (default: \.nim(s|ble)?$)
+  --config:file         config file to use (default: search upward for .nph.toml)
+  --strict-filters      respect exclude/include filters for all files (no bypass)
+  --version             show the version
+  --help                show this help
+
+Config file (.nph.toml):
+  exclude = ["pattern1", "pattern2"]     # Override default exclusions
+  extend-exclude = ["pattern3"]          # Add to default exclusions
+  include = ["\.nim$", "\.nims$"]        # File patterns to include
+  color = true                           # Enable colored diff output (default: auto)
