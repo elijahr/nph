@@ -13,10 +13,16 @@ jobs:
         include:
           - name: linux_x64
             builder: ubuntu-latest
+            target: linux_x64
+          - name: linux_arm64
+            builder: ubuntu-latest
+            target: linux_arm64
           - name: macosx_x64
             builder: macos-latest
+            target: macosx_x64
           - name: windows_x64
             builder: windows-latest
+            target: windows_x64
     defaults:
       run:
         shell: bash
@@ -45,8 +51,20 @@ jobs:
           nimble-version: '0.20.1'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Install ARM64 cross-compilation tools (Linux ARM64)
+        if: matrix.target == 'linux_arm64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
       - name: Build nph
-        run: nimble build
+        run: |
+          if [ "${{ matrix.target }}" = "linux_arm64" ]; then
+            nimble build --cpu:arm64 --os:linux --gcc.exe:aarch64-linux-gnu-gcc --gcc.linkerexe:aarch64-linux-gnu-gcc
+          else
+            nimble build
+          fi
 
       - name: Run tests
+        if: matrix.target != 'linux_arm64'
         run: nimble test
