@@ -12,14 +12,23 @@ function rangeWholeFile(doc: vscode.TextDocument): vscode.Range {
 
 function getFormattedString(doc: vscode.TextDocument): string {
   const workspaceDir = vscode.workspace.getWorkspaceFolder(doc.uri);
+  const filePath = doc.uri.fsPath;
 
-  return child_process
-    .execSync("nph -", {
-      encoding: "utf-8",
-      input: doc.getText(),
-      cwd: workspaceDir?.uri.fsPath
-    })
-    .toString();
+  try {
+    // Use --strict-filters to respect exclude/include patterns even for explicitly passed files
+    // Use --out:- to write formatted output to stdout
+    // This allows nph to check exclude/include patterns based on the actual file path
+    return child_process
+      .execSync(`nph --strict-filters --out:- "${filePath}"`, {
+        encoding: "utf-8",
+        cwd: workspaceDir?.uri.fsPath
+      })
+      .toString();
+  } catch (error: any) {
+    // If nph exits with an error (e.g., file is excluded or syntax error),
+    // return the original content unchanged
+    return doc.getText();
+  }
 }
 
 // this method is called when your extension is activated

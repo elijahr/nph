@@ -1,43 +1,48 @@
 --- tests/before/fmton.nim
 +++ tests/before/fmton.nim (formatted)
-@@ -10,7 +10,7 @@
+@@ -1,3 +1,4 @@
+-proc      getsFormatted(a, b : int    ) = discard
++proc getsFormatted(a, b: int) =
++  discard
+ 
+ #!fmt: off
+@@ -9,8 +10,7 @@
      [1, 2, 3]
  
  #!fmt: on
 -proc hanging(indent: int,
 -             isUgly = true) = discard
+-
 +proc hanging(indent: int, isUgly = true) =
 +  discard
  
  block:
-@@ -19,7 +19,8 @@
+@@ -19,5 +19,6 @@
      discard
    #!fmt: on
  
--  if         false: discard
+-  if   false   :
 +  if false:
-+    discard
- 
- #!fmt: off
- #[ block comment ]# # trailing comment should stay
+     discard
++
 --- tests/before/comments.nim
 +++ tests/before/comments.nim (formatted)
-@@ -13,6 +13,5 @@
- #
+@@ -14,6 +14,5 @@
  # Comment
  #
--
  
+-
  #[ a multiline comment
-@@ -49,6 +48,6 @@
- ]##
- # trailing doc comment on same line
+ this is also part of it
+@@ -30,6 +29,6 @@
+   ]#
+ ]#
  
 -template x =
 +template x() =
    ## A template doc comment
    try:
-@@ -62,41 +61,45 @@
+@@ -43,41 +42,45 @@
    LonelyObject* = object
  
  type
@@ -97,7 +102,7 @@
 +    # inherited next line indent comments
      f: int
  
-@@ -105,16 +108,18 @@
+@@ -86,16 +89,18 @@
      of true, false: # of eol
        v: string # case field eol
  
@@ -121,7 +126,7 @@
 +    ## after alias4
      ## more after alias4
  
-@@ -123,6 +128,6 @@
+@@ -104,6 +109,6 @@
      proc(v: int)
  
    SomeAlias6 = ##
@@ -129,7 +134,7 @@
 +    ## doc comment after equals before proc continued
      proc(v: int)
  
-@@ -131,15 +136,18 @@
+@@ -112,15 +117,18 @@
      when false: # when object false line
        discard
  
@@ -156,7 +161,7 @@
 +      field2: int ## comment tuple field2
  
    CommentedTuple2* =
-@@ -178,6 +186,6 @@
+@@ -159,6 +167,6 @@
    discard
  
  if true:
@@ -164,7 +169,7 @@
 +  # if dedented colon line
    discard
  # before else dedented
-@@ -202,19 +210,18 @@
+@@ -183,19 +191,18 @@
    # finally last line
  
  try:
@@ -188,7 +193,7 @@
 +for i in 0 .. 1: # for colon line
    # for first line
    discard
-@@ -227,6 +234,6 @@
+@@ -208,6 +215,6 @@
    # case else first line
    discard
  
@@ -196,7 +201,7 @@
 +f do() -> int: # do colon line
    # do first line
    discard
-@@ -252,8 +259,9 @@
+@@ -233,8 +240,9 @@
  discard Object( # object eol
    # object first line
    field: 0, # field line
@@ -208,7 +213,7 @@
 +    42,
  )
  
-@@ -267,6 +275,6 @@
+@@ -248,6 +256,6 @@
  ## needs to be double
  
  abc and
@@ -216,7 +221,7 @@
 +  # dedented comment in infix
    def
  
-@@ -275,11 +283,13 @@
+@@ -256,11 +264,13 @@
    def
  
  if abc and
@@ -234,7 +239,7 @@
 +  discard
  
  a(
-@@ -287,11 +297,11 @@
+@@ -268,11 +278,11 @@
  )
  
  a(
@@ -250,7 +255,7 @@
 +.}
  
  let v = 52 # let all on one line
-@@ -307,15 +317,19 @@
+@@ -288,15 +298,19 @@
  
  let # let eol
    v # let ident after symbol
@@ -276,7 +281,7 @@
 +    # const ident after equals
      42 # const ident after value
  
-@@ -329,19 +343,21 @@
+@@ -310,19 +324,21 @@
    b = 5
    # const section postfix
  
@@ -304,7 +309,7 @@
 +proc x() =
    ## A proc doc comment
    if true:
-@@ -350,19 +366,21 @@
+@@ -331,19 +347,21 @@
      for i in 0 ..< numberOfCharsRead:
        discard
  
@@ -330,7 +335,7 @@
 +proc f(): bool =
    ## Comment here
    ## another
-@@ -378,21 +396,27 @@
+@@ -359,21 +377,27 @@
      else:
        false
  
@@ -364,7 +369,7 @@
 +  discard
  
  command "a", "b", "c" # command eol comment
-@@ -404,7 +428,6 @@
+@@ -385,7 +409,6 @@
  command "first arg"
  # comment after command
  
@@ -373,7 +378,7 @@
 +command 234 # command after ind
  
  when false:
-@@ -431,12 +454,12 @@
+@@ -412,12 +435,12 @@
  if true:
    echo dotexpr.dot # after dotexpr in command ind
    # between two dotepxrs ind
@@ -388,7 +393,7 @@
 +  f.x
    # comment between the dots
    .z()
-@@ -445,15 +468,9 @@
+@@ -426,15 +449,9 @@
  
    # after dotexpr ind
  
@@ -406,7 +411,7 @@
 +  functionCall(param)
  
  block:
-@@ -463,6 +480,7 @@
+@@ -444,6 +461,7 @@
  
  discard
    # infix pre par
@@ -415,7 +420,7 @@
 +    # infix parle
      # infix prefix
      a and # infix post-operator
-@@ -475,40 +493,28 @@
+@@ -456,40 +474,28 @@
    # dedented comment post discard
  
  block:

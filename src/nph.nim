@@ -48,7 +48,8 @@ Options:
   --exclude:pattern     regex pattern for files/dirs to exclude (overrides defaults)
   --extend-exclude:pattern  regex pattern to add to default exclusions
   --include:pattern     regex pattern for files to include (default: \.nim(s|ble)?$)
-  --config:file         config file to use (default: .nph.toml if it exists)
+  --config:file         config file to use (default: search upward for .nph.toml)
+  --strict-filters      respect exclude/include filters for all files (no bypass)
   --version             show the version
   --help                show this help
 
@@ -94,6 +95,30 @@ proc makeConfigRef(): ConfigRef =
   let conf = newConfigRef()
   conf.errorMax = int.high
   conf
+
+proc findConfigFile(startPath: string, configFileName: string): string =
+  ## Walk up directory tree looking for config file
+  ## Returns empty string if not found
+  var currentDir =
+    if dirExists(startPath):
+      startPath.absolutePath
+    elif fileExists(startPath):
+      startPath.absolutePath.parentDir
+    else:
+      getCurrentDir()
+
+  # Walk up until we find the config or hit root
+  while true:
+    let candidatePath = currentDir / configFileName
+    if fileExists(candidatePath):
+      return candidatePath
+
+    let parentDir = currentDir.parentDir
+    # Check if we've hit the root (parent is same as current)
+    if parentDir == currentDir or parentDir.len == 0:
+      return ""
+
+    currentDir = parentDir
 
 proc loadConfig(configFile: string): NphConfig =
   result =
@@ -235,22 +260,25 @@ proc prettyPrint(
       # Always write file in debug mode
       writeFile(infile & ".nph.yaml", treeToYaml(nil, node) & "\n")
       if infile != outfile:
-        writeFile(outfile, output)
-        writeFile(
-          outfile & ".nph.yaml",
-          treeToYaml(nil, parse(output, outfile, printTokens, newConfigRef())) & "\n",
-        )
-    elif fileExists(outfile) and output == readFile(outfile):
+        if outfile != "-":
+          writeFile(outfile, output)
+          writeFile(
+            outfile & ".nph.yaml",
+            treeToYaml(nil, parse(output, outfile, printTokens, newConfigRef())) & "\n",
+          )
+        else:
+          write(stdout, output)
+    elif outfile != "-" and fileExists(outfile) and output == readFile(outfile):
       # No formatting difference - don't touch file modificuation date
       return QuitSuccess
 
   let eq = equivalent(input, infile, output, if infile == "-": "stdout" else: outfile)
 
   template writeUnformatted() =
-    if not debug and (infile != outfile or infile == "-"):
+    if not debug and (infile != outfile or infile == "-" or outfile == "-"):
       # Write unformatted content
       if not check:
-        if infile == "-":
+        if infile == "-" or outfile == "-":
           write(stdout, input)
         else:
           writeFile(outfile, input)
@@ -264,8 +292,8 @@ proc prettyPrint(
       ErrCheckFailed # We failed the equivalence check above
     else:
       # Formatting changed the file
-      if not debug or infile == "-":
-        if infile == "-":
+      if not debug or infile == "-" or outfile == "-":
+        if infile == "-" or outfile == "-":
           write(stdout, output)
         else:
           writeFile(outfile, output)
@@ -312,15 +340,17 @@ proc main() =
     diff = false
     printTokens = false
     usesDir = false
+    strictFilters = false # Strict filters: respect exclusions even for explicit files
     cliColorSet = false
     # Default to color if stdout is a TTY and NO_COLOR is not set or empty
     cliColor = getEnv("NO_COLOR") == "" and isatty(stdout)
     cliExclude = newSeq[string]()
     cliExtendExclude = newSeq[string]()
     cliInclude = newSeq[string]()
+    explicitConfigFile = false
 
-  # Default config file location
-  configFile = ".nph.toml"
+  # Default config file name (will search upward for it)
+  configFile = ""
 
   for kind, key, val in getopt():
     case kind
@@ -359,6 +389,8 @@ proc main() =
       of "no-color", "nocolor":
         cliColorSet = true
         cliColor = false
+      of "strict-filters", "strictfilters":
+        strictFilters = true
       of "exclude":
         cliExclude.add(val)
       of "extend-exclude", "extendexclude":
@@ -367,6 +399,7 @@ proc main() =
         cliInclude.add(val)
       of "config":
         configFile = val
+        explicitConfigFile = true
       of "":
         let f = "-"
         infiles.add(f)
@@ -376,8 +409,23 @@ proc main() =
     of cmdEnd:
       assert(false) # cannot happen
 
-  # Load config from file
-  var config = loadConfig(configFile)
+  # Find config file by searching upward from first input file if not explicitly set
+  if not explicitConfigFile:
+    let searchStart =
+      if infiles.len > 0:
+        infiles[0]
+      else:
+        getCurrentDir()
+    configFile = findConfigFile(searchStart, ".nph.toml")
+
+  # Load config from file (empty string if not found)
+  var config =
+    if configFile.len > 0:
+      loadConfig(configFile)
+    else:
+      NphConfig(
+        exclude: @[], extendExclude: @[], includePatterns: @[], color: none(bool)
+      )
 
   # Determine final color setting with proper precedence:
   # 1. CLI flags (--color/--no-color) override everything
@@ -426,10 +474,14 @@ proc main() =
   )
 
   # Filter input files based on include/exclude patterns
-  # BUT: explicitly passed files bypass filtering (like Black)
+  # With --strict-filters, all files respect filters (no bypass for explicit files)
+  # Otherwise, explicitly passed files bypass filtering (like Black)
   var filteredFiles = newSeq[string]()
   for file in infiles:
-    if file in explicitFiles or matchesFilters(file, compiledPatterns):
+    # Use absolute path for filtering to ensure patterns match correctly
+    let absPath = if file.isAbsolute: file else: file.absolutePath
+    if (not strictFilters and file in explicitFiles) or
+        matchesFilters(absPath, compiledPatterns):
       filteredFiles.add(file)
 
   infiles = filteredFiles

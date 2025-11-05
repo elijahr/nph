@@ -1,25 +1,30 @@
 --- tests/before/fmton.nim
 +++ tests/before/fmton.nim (formatted)
-@@ -10,7 +10,7 @@
+@@ -1,3 +1,4 @@
+-proc      getsFormatted(a, b : int    ) = discard
++proc getsFormatted(a, b: int) =
++  discard
+ 
+ #!fmt: off
+@@ -9,8 +10,7 @@
      [1, 2, 3]
-
+ 
  #!fmt: on
 -proc hanging(indent: int,
 -             isUgly = true) = discard
+-
 +proc hanging(indent: int, isUgly = true) =
 +  discard
-
+ 
  block:
-@@ -19,7 +19,8 @@
+@@ -19,5 +19,6 @@
      discard
    #!fmt: on
-
--  if         false: discard
+ 
+-  if   false   :
 +  if false:
-+    discard
-
- #!fmt: off
- #[ block comment ]# # trailing comment should stay
+     discard
++
 
 Oh no! 💥 💔 💥
 1 file would be reformatted.
