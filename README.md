@@ -90,6 +90,56 @@ See the [installation instructions](https://arnetheduck.github.io/nph/installati
 
 Editor integrations are described [in the manual](https://arnetheduck.github.io/nph/installation.html#editor-integration).
 
+## Pre-commit hook
+
+A simple pre-commit hook is available to automatically format your Nim code before committing. To install:
+
+```sh
+# Copy the pre-commit hook to your .git/hooks directory
+cp .git/hooks/pre-commit.sample .git/hooks/pre-commit
+```
+
+Or create it manually:
+
+```sh
+cat > .git/hooks/pre-commit << 'EOF'
+#!/usr/bin/env bash
+# Simple pre-commit hook for nph (Nim code formatter)
+
+set -e
+
+# Get list of staged Nim files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.nim$' || true)
+
+if [ -z "$STAGED_FILES" ]; then
+    exit 0
+fi
+
+echo "nph (Nim formatter)....................................................."
+
+# Run nph on staged files
+./nph $STAGED_FILES 2>&1
+
+# Check if any files were modified
+if ! git diff --quiet $STAGED_FILES; then
+    echo "Failed"
+    echo ""
+    echo "Files were modified by this hook. Please review changes and commit again."
+    echo ""
+    echo "Modified files:"
+    git diff --name-only $STAGED_FILES | sed 's/^/  - /'
+    exit 1
+fi
+
+echo "Passed"
+exit 0
+EOF
+
+chmod +x .git/hooks/pre-commit
+```
+
+The hook will automatically format staged Nim files and prevent commits if formatting changes were made, allowing you to review the changes first.
+
 ## Continuous integration
 
 Check out the [companion Github Action](https://github.com/arnetheduck/nph-action) for a convenient CI option!

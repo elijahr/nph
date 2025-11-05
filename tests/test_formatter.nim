@@ -1000,9 +1000,10 @@ suite "--version and --help":
     let version = output.strip()
     # Version format from git describe: tag-N-ghash or prerelease-N-ghash
     # Examples: "prerelease-9-gec0a3d7" or "v1.0.0-0-g1234567-dirty"
+    # In CI or tarball builds, may just be a version tag without git hash
     check version.len > 0
-    # Should contain a git hash (starts with 'g' after dash)
-    check version.contains("-g")
+    # Should contain version-like content (either git hash or semver)
+    check version.contains("-") or version.contains(".")
     # Should not have stderr output mixed in
     check not version.contains("Error")
     check not version.contains("Warning")
