@@ -302,7 +302,7 @@ suite "--out:- (stdout) mode":
     # With --strict-filters, file is excluded (error)
     let (output2, exitCode2) = execCmdEx(nphBin & " --strict-filters --out:- " & file1)
     check exitCode2 == 3
-    check "no input file" in output2
+    check output2.strip() == "[Error] no input file."
     removeDir(tmpDir)
 
   test "--out:- works from nested directory with upward config":
@@ -363,7 +363,7 @@ suite "--out:- (stdout) mode":
 
     # --out:- and --diff are incompatible
     check exitCode == 3
-    check "Error" in output or "error" in output
+    check output.strip() == "[Error] diff cannot be used with out or outDir"
 
 suite "error handling":
   test "invalid syntax exits with error code":
@@ -1436,7 +1436,7 @@ suite "--strict-filters mode":
     # With --strict-filters, explicit file respects exclude
     let (output2, exitCode2) = execCmdEx(nphBin & " --check --strict-filters " & file1)
     check exitCode2 == 3 # No input file error
-    check "no input file" in output2
+    check output2.strip() == "[Error] no input file."
     removeDir(tmpDir)
 
   test "--strict-filters respects include for explicit files":
@@ -1459,7 +1459,7 @@ suite "--strict-filters mode":
         file1
     )
     check exitCode2 == 3 # No input file error
-    check "no input file" in output2
+    check output2.strip() == "[Error] no input file."
     removeDir(tmpDir)
 
   test "--strict-filters with upward config search":
@@ -1479,7 +1479,7 @@ suite "--strict-filters mode":
     )
 
     check exitCode == 3 # No input file error
-    check "no input file" in output
+    check output.strip() == "[Error] no input file."
     removeDir(tmpDir)
 
   test "--strict-filters with directory argument respects filters":
