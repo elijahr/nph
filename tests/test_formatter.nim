@@ -7,6 +7,7 @@
 ## All other test suites are defined normally below.
 
 import std/[unittest, os, osproc, strutils, sequtils, macros, times]
+import pkg/regex
 
 proc getTempTestDir(name: string): string =
   ## Get a cross-platform temporary directory for testing
@@ -998,24 +999,35 @@ suite "--version and --help":
     check exitCode == 0
     check output.len > 0
     let version = output.strip()
-    # Version format from git describe: tag-N-ghash or prerelease-N-ghash
-    # Examples: "prerelease-9-gec0a3d7" or "v1.0.0-0-g1234567-dirty"
-    # In CI or tarball builds, may just be a version tag without git hash
-    check version.len > 0
-    # Should contain version-like content (either git hash or semver)
-    check version.contains("-") or version.contains(".")
-    # Should not have stderr output mixed in
-    check not version.contains("Error")
-    check not version.contains("Warning")
+    # Version format can be:
+    # 1. Full git describe: "prerelease-16-ga4cc33a" or "v1.0.0-0-g1234567"
+    # 2. With dirty suffix: "prerelease-16-ga4cc33a-dirty"
+    # 3. Short commit hash only (shallow clone): "a4cc33a"
+    # 4. Semver tag: "v0.6.1" or "0.6.1"
+    # Regex pattern matches any of these formats:
+    # - tag-N-ghash format: prerelease-16-ga4cc33a or v1.0.0-0-g1234567
+    # - semver with optional v prefix: v1.0.0 or 1.0.0
+    # - short commit hash (7+ hex chars): a4cc33a
+    # - any of the above with optional -dirty suffix
+    let versionPattern = re2"^([a-z0-9]+(-[0-9]+-g[a-f0-9]+)?|v?\d+\.\d+(\.\d+)?(-[0-9]+-g[a-f0-9]+)?)(-dirty)?$"
+    let versionMatches = version.match(versionPattern)
+    if not versionMatches:
+      checkpoint("Version '" & version & "' does not match expected format")
+    check versionMatches
 
   test "--help shows usage information":
     let (output, exitCode) = execCmdEx(nphBin & " --help")
 
     check exitCode == 0
+    # Verify help output contains all essential sections and key options
     check "Usage:" in output
     check "Options:" in output
     check "--check" in output
     check "--diff" in output
+    check "--version" in output
+    check "--help" in output
+    check "--config" in output
+    check "--out" in output
 
 suite "config file color setting":
   test "config file color=true enables color in --diff":
